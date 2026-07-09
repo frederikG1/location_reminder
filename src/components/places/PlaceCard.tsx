@@ -7,8 +7,8 @@ type Props = {
 };
 
 export default function PlaceCard({ place, onPress }: Props) {
-  // const formatDist = (value?: number) =>
-  //   typeof value === "number" ? value.toFixed(5) : "-";
+  const formatDist = (value?: number) =>
+    typeof value === "number" ? value.toFixed(5) : "-";
   return (
     <Pressable style={styles.card} onPress={onPress}>
       <Text style={styles.title}>{place.name}</Text>
@@ -26,8 +26,8 @@ export default function PlaceCard({ place, onPress }: Props) {
         {new Date(place.createdAt).toLocaleDateString()}
       </Text>
 
-      {/* <Text>Lat: {formatDist(place.latitude)}</Text>
-      <Text>Long:{formatDist(place.longitude)}</Text> */}
+      <Text>Lat: {formatDist(place.latitude)}</Text>
+      <Text>Long:{formatDist(place.longitude)}</Text>
     </Pressable>
   );
 }

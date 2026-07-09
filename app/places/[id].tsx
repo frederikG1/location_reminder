@@ -16,6 +16,8 @@ export default function PlaceDetailScreen() {
     );
   }
 
+  
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{place.name}</Text>

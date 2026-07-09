@@ -47,12 +47,14 @@ export default function HomeScreen() {
         renderItem={({ item }) => (
           <PlaceCard
             place={item}
-            onPress={() =>
+            onPress={() => {
+              console.log(item);
+
               router.push({
                 pathname: "/places/[id]",
                 params: { id: item.id },
-              })
-            }
+              });
+            }}
           />
         )}
       />
