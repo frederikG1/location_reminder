@@ -1,17 +1,23 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Button, FlatList, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import CreatePlaceModal from "@/src/components/places/CreatePlaceModal";
 import PlaceCard from "@/src/components/places/PlaceCard";
+import CreatePlaceModal from "@/src/components/places/PlaceFormModal";
 import { usePlaces } from "@/src/hooks/usePlaces";
 import { getCurrentLocation } from "@/src/services/location";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 
 export default function HomeScreen() {
   const [createModalVisible, setCreateModalVisible] = useState(false);
 
-  const { places, create } = usePlaces();
+  const { places, create, refresh } = usePlaces();
+
+  useFocusEffect(
+    useCallback(() => {
+      refresh();
+    }, [refresh]),
+  );
 
   async function handleCreatePlace(name: string, note: string) {
     try {
@@ -39,6 +45,11 @@ export default function HomeScreen() {
       <Button
         title="Gem nyt sted"
         onPress={() => setCreateModalVisible(true)}
+      />
+
+      <Button
+        title="Åbn kort"
+        onPress={() => router.push("/map")}
       />
 
       <FlatList

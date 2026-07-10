@@ -14,5 +14,3 @@ export async function getCurrentLocation() {
     longitude: location.coords.longitude,
   };
 }
-
-

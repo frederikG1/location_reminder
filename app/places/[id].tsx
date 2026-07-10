@@ -1,10 +1,13 @@
-import { View, Text, StyleSheet, Button, Alert } from "react-native";
-import { useLocalSearchParams, router } from "expo-router";
+import CreatePlaceModal from "@/src/components/places/PlaceFormModal";
 import { usePlaces } from "@/src/hooks/usePlaces";
+import { router, useLocalSearchParams } from "expo-router";
+import { useState } from "react";
+import { Alert, Button, StyleSheet, Text, View } from "react-native";
 
 export default function PlaceDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { places, remove } = usePlaces();
+  const { places, remove, update } = usePlaces();
+  const [editModalVisible, setEditModalVisible] = useState(false);
 
   const place = places.find((item) => item.id === id);
 
@@ -30,6 +33,30 @@ export default function PlaceDetailScreen() {
           handleDelete(place.id);
         }}
       />
+
+      <Button
+        title="Rediger"
+        onPress={() => {
+          setEditModalVisible(true);
+        }}
+      />
+
+      <CreatePlaceModal
+        visible={editModalVisible}
+        onClose={() => setEditModalVisible(false)}
+        initialName={place.name}
+        initialNote={place.note}
+        onSave={(name, note) =>
+          handleUpdatePlace(
+            id,
+            name,
+            note,
+            place.latitude,
+            place.longitude,
+            place.createdAt,
+          )
+        }
+      />
     </View>
   );
 
@@ -45,10 +72,35 @@ export default function PlaceDetailScreen() {
         onPress: async () => {
           await remove(placeId);
 
-          router.replace("/");
+          router.back();
         },
       },
     ]);
+  }
+
+  async function handleUpdatePlace(
+    id: string,
+    name: string,
+    note: string,
+    latitude: number,
+    longitude: number,
+    createdAt: string,
+  ) {
+    try {
+      await update({
+        name,
+        note,
+        id,
+        latitude,
+        longitude,
+        createdAt,
+      });
+
+      setEditModalVisible(false);
+      router.back();
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
 
