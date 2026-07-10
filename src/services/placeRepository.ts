@@ -21,3 +21,21 @@ export async function getPlaces(): Promise<Place[]> {
 
   return JSON.parse(data);
 }
+
+export async function updatePlace(updatedPlace: Place) {
+  const places = await getPlaces();
+
+  const updatedPlaces = places.map((place) =>
+    place.id === updatedPlace.id ? updatedPlace : place,
+  );
+
+  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPlaces));
+}
+
+export async function deletePlace(id: string) {
+  const places = await getPlaces();
+
+  const deletedPlaces = places.filter((place) => place.id !== id);
+
+  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(deletedPlaces));
+}

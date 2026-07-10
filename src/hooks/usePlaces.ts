@@ -35,6 +35,18 @@ export function usePlaces() {
     }
   };
 
+  const remove = async (id: string) => {
+    await placeRepository.deletePlace(id);
+
+    await refresh();
+  };
+
+  const update = async (updatedPlace: Place) => {
+    await placeRepository.updatePlace(updatedPlace);
+
+    await refresh();
+  };
+
   useEffect(() => {
     refresh();
   }, [refresh]);
@@ -42,6 +54,8 @@ export function usePlaces() {
   return {
     places,
     create,
+    update,
+    remove,
     refresh,
   };
 }
