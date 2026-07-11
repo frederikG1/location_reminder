@@ -5,6 +5,7 @@ export type Place = {
 
   latitude: number;
   longitude: number;
+  radius: number;
   
   createdAt: string;
 };

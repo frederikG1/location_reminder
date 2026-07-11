@@ -53,6 +53,7 @@ export default function PlaceDetailScreen() {
             note,
             place.latitude,
             place.longitude,
+            place.radius,
             place.createdAt,
           )
         }
@@ -84,6 +85,7 @@ export default function PlaceDetailScreen() {
     note: string,
     latitude: number,
     longitude: number,
+    radius: number,
     createdAt: string,
   ) {
     try {
@@ -93,6 +95,7 @@ export default function PlaceDetailScreen() {
         id,
         latitude,
         longitude,
+        radius,
         createdAt,
       });
 

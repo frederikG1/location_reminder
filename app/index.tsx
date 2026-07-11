@@ -28,6 +28,7 @@ export default function HomeScreen() {
         note,
         latitude: currentLocation.latitude,
         longitude: currentLocation.longitude,
+        radius: 220,
       });
 
       setCreateModalVisible(false);
@@ -47,10 +48,7 @@ export default function HomeScreen() {
         onPress={() => setCreateModalVisible(true)}
       />
 
-      <Button
-        title="Åbn kort"
-        onPress={() => router.push("/map")}
-      />
+      <Button title="Åbn kort" onPress={() => router.push("/map")} />
 
       <FlatList
         data={places}

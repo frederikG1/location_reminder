@@ -1,10 +1,11 @@
 import MapView, { Marker } from "react-native-maps";
-import { StyleSheet } from "react-native";
+import { Alert, StyleSheet } from "react-native";
 import { usePlaces } from "@/src/hooks/usePlaces";
 import { router } from "expo-router";
 import { useEffect, useRef } from "react";
 import { calculateDistance } from "@/src/services/distance";
 import { useLocation } from "@/src/hooks/useLocation";
+import { useProximityAlerts } from "@/src/hooks/useProximityAlerts";
 
 export default function MapScreen() {
   const { places } = usePlaces();
@@ -12,6 +13,10 @@ export default function MapScreen() {
 
   //get locations from useLocation
   const { location } = useLocation();
+
+  useProximityAlerts((place) => {
+    Alert.alert("Du er i nærheden!", `${place.name} er lige i nærheden`)
+  })
 
   useEffect(() => {
     if (!location) {

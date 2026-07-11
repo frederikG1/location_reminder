@@ -15,6 +15,7 @@ export function usePlaces() {
     note?: string;
     latitude: number;
     longitude: number;
+    radius: number;
   };
 
   const create = async (input: CreatePlaceInput) => {
@@ -24,6 +25,7 @@ export function usePlaces() {
       note: input.note,
       latitude: input.latitude,
       longitude: input.longitude,
+      radius: input.radius,
       createdAt: new Date().toISOString(),
     };
 
