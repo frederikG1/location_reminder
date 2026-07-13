@@ -1,11 +1,12 @@
-import MapView, { Marker } from "react-native-maps";
-import { Alert, StyleSheet } from "react-native";
+import MapView, { Circle, Marker } from "react-native-maps";
+import { StyleSheet } from "react-native";
 import { usePlaces } from "@/src/hooks/usePlaces";
 import { router } from "expo-router";
-import { useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import { calculateDistance } from "@/src/services/distance";
 import { useLocation } from "@/src/hooks/useLocation";
 import { useProximityAlerts } from "@/src/hooks/useProximityAlerts";
+import { requestNotificationPermissions, sendNotification} from "@/src/services/notifications";
 
 export default function MapScreen() {
   const { places } = usePlaces();
@@ -15,8 +16,12 @@ export default function MapScreen() {
   const { location } = useLocation();
 
   useProximityAlerts((place) => {
-    Alert.alert("Du er i nærheden!", `${place.name} er lige i nærheden`)
-  })
+    sendNotification("Du er i nærheden!", `${place.name} er lige i nærheden`);
+  });
+
+  useEffect(() => {
+    requestNotificationPermissions();
+  }, []);
 
   useEffect(() => {
     if (!location) {
@@ -39,6 +44,8 @@ export default function MapScreen() {
       showsMyLocationButton={true}
     >
       {places.map((place) => {
+        const radius = place.radius ?? 200;
+
         const distance = location
           ? calculateDistance(
               location.latitude,
@@ -48,23 +55,34 @@ export default function MapScreen() {
             )
           : null;
 
+        const isNearby = distance !== null && distance <= radius;
+
         return (
-          <Marker
-            key={place.id}
-            coordinate={{
-              latitude: place.latitude,
-              longitude: place.longitude,
-            }}
-            title={place.name}
-            description={
-              distance
-                ? `${Math.round(distance)} meter væk - ${place.note ?? ""}`
-                : place.note
-            }
-            onCalloutPress={() => {
-              router.navigate(`/places/${place.id}`);
-            }}
-          />
+          <Fragment key={place.id}>
+            <Marker
+              coordinate={{
+                latitude: place.latitude,
+                longitude: place.longitude,
+              }}
+              title={place.name}
+              description={
+                distance
+                  ? `${Math.round(distance)} meter væk - ${place.note ?? ""}`
+                  : place.note
+              }
+              pinColor={isNearby ? "green" : "red"}
+              onCalloutPress={() => {
+                router.navigate(`/places/${place.id}`);
+              }}
+            />
+            <Circle
+              center={{
+                latitude: place.latitude,
+                longitude: place.longitude,
+              }}
+              radius={radius}
+            />
+          </Fragment>
         );
       })}
     </MapView>
