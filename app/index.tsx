@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import { Button, FlatList, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -39,7 +39,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text>Location Reminder 🚀</Text>
+      <Text>Dette er test</Text>
 
       {/* <Button title="Find min position" onPress={handleGetLocation} />
       <Button title="Gem dette sted" onPress={handleSavePlace} /> */}

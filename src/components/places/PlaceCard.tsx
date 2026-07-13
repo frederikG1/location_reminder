@@ -1,5 +1,5 @@
-import { Text, StyleSheet, Pressable } from "react-native";
 import { Place } from "@/src/models/Place";
+import { Pressable, StyleSheet, Text } from "react-native";
 
 type Props = {
   place: Place;
