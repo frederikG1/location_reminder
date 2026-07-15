@@ -5,7 +5,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import PlaceCard from "@/src/components/places/PlaceCard";
 import CreatePlaceModal from "@/src/components/places/PlaceFormModal";
 import { usePlaces } from "@/src/hooks/usePlaces";
-import { getCurrentLocation } from "@/src/services/location";
+import {
+  getCurrentLocation,
+  hasBackgroundLocationPermission,
+} from "@/src/services/location";
 import { router, useFocusEffect } from "expo-router";
 
 export default function HomeScreen() {
@@ -48,6 +51,16 @@ export default function HomeScreen() {
         </Text>
       </View>
 
+      <Pressable
+        onPress={async () => {
+          const granted = await hasBackgroundLocationPermission();
+
+          console.log("Background permission granted:", granted);
+        }}
+      >
+        <Text>Test background permission</Text>
+      </Pressable>
+
       <FlatList
         data={places}
         keyExtractor={(item) => item.id}
@@ -55,7 +68,8 @@ export default function HomeScreen() {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Text style={styles.emptyStateText}>
-              Gem dit første sted, så du kan blive mindet om det, næste gang du er i nærheden.
+              Gem dit første sted, så du kan blive mindet om det, næste gang du
+              er i nærheden.
             </Text>
           </View>
         }

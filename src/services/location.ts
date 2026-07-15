@@ -15,7 +15,7 @@ export async function getCurrentLocation() {
   };
 }
 
-export async function requestBackgroundPermissionsAsync() {
+export async function requestBackgroundLocationPermission() {
   const { status: foregroundStatus } =
     await Location.getForegroundPermissionsAsync();
 
