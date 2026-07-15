@@ -8,16 +8,28 @@ type Location = {
 
 export function useLocation() {
   const [location, setLocation] = useState<Location | null>(null);
-  
-  async function refreshLocation() {
-    const currentLocation = await getCurrentLocation();
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-    setLocation(currentLocation);
+  async function refreshLocation() {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const currentLocation = await getCurrentLocation();
+      setLocation(currentLocation);
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : "Kunne ikke hente lokation",
+      );
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   useEffect(() => {
     refreshLocation();
   }, []);
 
-  return {location, refreshLocation};
+  return { location, refreshLocation, isLoading, error };
 }

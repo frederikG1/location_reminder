@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { Place } from "@/src/models/Place";
 import * as placeRepository from "@/src/services/placeRepository";
+import * as Crypto from "expo-crypto";
+
 
 export function usePlaces() {
   const [places, setPlaces] = useState<Place[]>([]);
@@ -20,7 +22,7 @@ export function usePlaces() {
 
   const create = async (input: CreatePlaceInput) => {
     const place: Place = {
-      id: Date.now().toString(),
+      id: Crypto.randomUUID(),
       name: input.name,
       note: input.note,
       latitude: input.latitude,

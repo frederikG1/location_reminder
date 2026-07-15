@@ -7,6 +7,8 @@ import { calculateDistance } from "@/src/services/distance";
 import { useLocation } from "@/src/hooks/useLocation";
 import { useProximityAlerts } from "@/src/hooks/useProximityAlerts";
 import { requestNotificationPermissions, sendNotification} from "@/src/services/notifications";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Text } from "@react-navigation/elements";
 
 export default function MapScreen() {
   const { places } = usePlaces();

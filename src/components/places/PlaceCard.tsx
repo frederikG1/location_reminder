@@ -1,5 +1,5 @@
 import { Place } from "@/src/models/Place";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 type Props = {
   place: Place;
@@ -7,51 +7,86 @@ type Props = {
 };
 
 export default function PlaceCard({ place, onPress }: Props) {
-  const formatDist = (value?: number) =>
-    typeof value === "number" ? value.toFixed(5) : "-";
   return (
-    <Pressable style={styles.card} onPress={onPress}>
-      <Text style={styles.title}>{place.name}</Text>
+    <Pressable
+      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+      onPress={onPress}
+    >
+      <View style={styles.row}>
+        <Text style={styles.title} numberOfLines={1}>
+          {place.name}
+        </Text>
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>{place.radius}m</Text>
+        </View>
+      </View>
 
-      {place.note && (
-        <Text style={styles.note}>
-          Lille note om stedet:
-          {"\n"}
+      {place.note ? (
+        <Text style={styles.note} numberOfLines={2}>
           {place.note}
         </Text>
-      )}
-      <Text>{"\n"}</Text>
+      ) : null}
 
       <Text style={styles.date}>
-        {new Date(place.createdAt).toLocaleDateString()}
+        Gemt {new Date(place.createdAt).toLocaleDateString("da-DK")}
       </Text>
-
-      <Text>Lat: {formatDist(place.latitude)}</Text>
-      <Text>Long:{formatDist(place.longitude)}</Text>
     </Pressable>
   );
 }
 
+const colors = {
+  surface: "#FFFFFF",
+  border: "#E5E5E1",
+  textPrimary: "#1A1A1A",
+  textSecondary: "#6B6B6B",
+  textMuted: "#9B9B95",
+  badgeBg: "#E8F1EC",
+  badgeText: "#1D6B4B",
+};
+
 const styles = StyleSheet.create({
   card: {
-    padding: 16,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
     borderRadius: 12,
-    marginVertical: 8,
-    backgroundColor: "#f4f4f4",
+    padding: 16,
   },
-
+  cardPressed: {
+    backgroundColor: "#FAFAF8",
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: 8,
+  },
   title: {
+    flex: 1,
     fontSize: 18,
     fontWeight: "600",
+    color: colors.textPrimary,
   },
-
+  badge: {
+    backgroundColor: colors.badgeBg,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  badgeText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: colors.badgeText,
+  },
   note: {
     marginTop: 8,
     fontSize: 14,
+    lineHeight: 20,
+    color: colors.textSecondary,
   },
-
   date: {
-    marginTop: 8,
+    marginTop: 12,
     fontSize: 12,
+    color: colors.textMuted,
   },
 });

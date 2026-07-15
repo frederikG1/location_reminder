@@ -10,7 +10,12 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.frederik.locationreminder"
+      "bundleIdentifier": "com.frederik.locationreminder",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Vi bruger din lokation til at gemme og finde dine steder.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Tillad lokation i baggrunden, så vi kan minde dig om dine gemte steder, selv når appen ikke er åben.",
+        "UIBackgroundModes": ["location"]
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -28,6 +33,12 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Tillad lokation i baggrunden, så vi kan minde dig om dine gemte steder, selv når appen ikke er åben."
+        }
+      ],
       "expo-router",
       [
         "expo-splash-screen",
