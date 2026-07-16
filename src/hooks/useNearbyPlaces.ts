@@ -18,12 +18,6 @@ export function useNearbyPlaces() {
         place.longitude,
       );
 
-      console.log({
-        name: place.name,
-        distance,
-        radius: place.radius,
-      });
-
       return distance < place.radius;
     });
   }, [places, location]);

@@ -19,6 +19,8 @@ export async function requestBackgroundLocationPermission() {
   const { status: foregroundStatus } =
     await Location.getForegroundPermissionsAsync();
 
+  
+
   if (foregroundStatus !== "granted") {
     throw new Error(
       "Foreground permission require before requesting background permission",
@@ -26,6 +28,7 @@ export async function requestBackgroundLocationPermission() {
   }
 
   const { status } = await Location.requestBackgroundPermissionsAsync();
+
 
   return status === "granted";
 }

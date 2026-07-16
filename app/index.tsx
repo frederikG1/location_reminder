@@ -5,16 +5,23 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import PlaceCard from "@/src/components/places/PlaceCard";
 import CreatePlaceModal from "@/src/components/places/PlaceFormModal";
 import { usePlaces } from "@/src/hooks/usePlaces";
-import {
-  getCurrentLocation,
-  hasBackgroundLocationPermission,
-} from "@/src/services/location";
+import { getCurrentLocation } from "@/src/services/location";
 import { router, useFocusEffect } from "expo-router";
+import { useBackgroundPermissionPrompt } from "@/src/hooks/useBackgroundPermissionPrompt";
+import BackgroundPermissionModal from "@/src/components/BackgroundPermissionModal";
 
 export default function HomeScreen() {
   const [createModalVisible, setCreateModalVisible] = useState(false);
 
   const { places, create, refresh } = usePlaces();
+
+  const {
+    visible: permissionPromptVisible,
+    placeName: permissionPromptPlaceName,
+    maybeShowPrompt,
+    handleAccept,
+    handleDismiss,
+  } = useBackgroundPermissionPrompt();
 
   useFocusEffect(
     useCallback(() => {
@@ -25,6 +32,7 @@ export default function HomeScreen() {
   async function handleCreatePlace(name: string, note: string, radius: number) {
     try {
       const currentLocation = await getCurrentLocation();
+      const wasFirstPlace = places.length === 0;
 
       await create({
         name,
@@ -35,6 +43,7 @@ export default function HomeScreen() {
       });
 
       setCreateModalVisible(false);
+      await maybeShowPrompt(wasFirstPlace, name);
     } catch (error) {
       console.log(error);
     }
@@ -51,15 +60,12 @@ export default function HomeScreen() {
         </Text>
       </View>
 
-      <Pressable
-        onPress={async () => {
-          const granted = await hasBackgroundLocationPermission();
-
-          console.log("Background permission granted:", granted);
-        }}
-      >
-        <Text>Test background permission</Text>
-      </Pressable>
+      <BackgroundPermissionModal
+        visible={permissionPromptVisible}
+        placeName={permissionPromptPlaceName}
+        onAccept={handleAccept}
+        onDismiss={handleDismiss}
+      />
 
       <FlatList
         data={places}
