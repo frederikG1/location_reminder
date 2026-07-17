@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { Place } from "@/src/models/Place";
 import * as placeRepository from "@/src/services/placeRepository";
 import * as Crypto from "expo-crypto";
-
+import { syncGeofences } from "@/src/services/geofencing";
+import { hasBackgroundLocationPermission } from "@/src/services/location";
 
 export function usePlaces() {
   const [places, setPlaces] = useState<Place[]>([]);
@@ -54,6 +55,16 @@ export function usePlaces() {
   useEffect(() => {
     refresh();
   }, [refresh]);
+
+  //Syncer geofences hver gang listen af steder ændrer sig
+  useEffect(() => {
+    (async () => {
+      const hasPermission = await hasBackgroundLocationPermission();
+      if (hasPermission) {
+        await syncGeofences(places);
+      }
+    })();
+  }, [places]);
 
   return {
     places,

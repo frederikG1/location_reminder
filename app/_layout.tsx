@@ -1,4 +1,6 @@
 import { Stack } from "expo-router";
+import "@/src/tasks/geofencingTask";
+
 
 export default function RootLayout() {
   return (
