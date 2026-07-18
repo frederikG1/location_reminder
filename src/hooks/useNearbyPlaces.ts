@@ -18,7 +18,7 @@ export function useNearbyPlaces() {
         place.longitude,
       );
 
-      return distance < place.radius;
+      return distance <= place.radius;
     });
   }, [places, location]);
 

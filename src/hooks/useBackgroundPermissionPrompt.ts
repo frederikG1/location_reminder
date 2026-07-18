@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { requestBackgroundLocationPermission } from "../services/location";
+import { requestNotificationPermissions } from "../services/notifications";
 import {
   hasAskedBackgroundPermission,
   markAskedForBackgroundPermission,
@@ -27,6 +28,7 @@ export function useBackgroundPermissionPrompt() {
     try {
       const granted = await requestBackgroundLocationPermission();
       console.log("Background permission result:", granted);
+      await requestNotificationPermissions();
     } catch (error) {
       console.log("Error in handleAccept:", error);
     } finally {

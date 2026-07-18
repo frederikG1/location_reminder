@@ -1,10 +1,14 @@
 import * as Location from "expo-location";
 
 export async function getCurrentLocation() {
-  const { status } = await Location.requestForegroundPermissionsAsync();
+  const { status } = await Location.getForegroundPermissionsAsync();
 
   if (status !== "granted") {
-    throw new Error("Location permission denied");
+    const { status: requested } =
+      await Location.requestForegroundPermissionsAsync();
+    if (requested !== "granted") {
+      throw new Error("Location permission denied");
+    }
   }
 
   const location = await Location.getCurrentPositionAsync({});
@@ -19,8 +23,6 @@ export async function requestBackgroundLocationPermission() {
   const { status: foregroundStatus } =
     await Location.getForegroundPermissionsAsync();
 
-  
-
   if (foregroundStatus !== "granted") {
     throw new Error(
       "Foreground permission require before requesting background permission",
@@ -28,7 +30,6 @@ export async function requestBackgroundLocationPermission() {
   }
 
   const { status } = await Location.requestBackgroundPermissionsAsync();
-
 
   return status === "granted";
 }

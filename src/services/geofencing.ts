@@ -1,13 +1,35 @@
-import * as Location from "expo-location";
 import { Place } from "@/src/models/Place";
 import { GEOFENCING_TASK_NAME } from "@/src/tasks/geofencingTask";
+import * as Location from "expo-location";
+
+let lastSyncedPlaceIds: string[] = [];
 
 export async function syncGeofences(places: Place[]): Promise<void> {
-  const isRegistered =
-    await Location.hasStartedGeofencingAsync(GEOFENCING_TASK_NAME);
+  // Only sync if place IDs actually changed
+  const currentPlaceIds = places.map((p) => p.id).sort();
+  const idsChanged =
+    currentPlaceIds.length !== lastSyncedPlaceIds.length ||
+    currentPlaceIds.some((id, index) => id !== lastSyncedPlaceIds[index]);
 
-  if (isRegistered) {
-    await Location.stopGeofencingAsync(GEOFENCING_TASK_NAME);
+  if (!idsChanged) {
+    return;
+  }
+
+  lastSyncedPlaceIds = currentPlaceIds;
+
+  try {
+    const isRegistered =
+      await Location.hasStartedGeofencingAsync(GEOFENCING_TASK_NAME);
+
+    if (isRegistered) {
+      try {
+        await Location.stopGeofencingAsync(GEOFENCING_TASK_NAME);
+      } catch (error) {
+        console.log("Error stopping geofencing:", error);
+      }
+    }
+  } catch (error) {
+    console.log("Error checking geofencing status:", error);
   }
 
   if (places.length === 0) {
@@ -31,10 +53,18 @@ export async function syncGeofences(places: Place[]): Promise<void> {
 }
 
 export async function stopAllGeofencing(): Promise<void> {
-  const isRegistered =
-    await Location.hasStartedGeofencingAsync(GEOFENCING_TASK_NAME);
+  try {
+    const isRegistered =
+      await Location.hasStartedGeofencingAsync(GEOFENCING_TASK_NAME);
 
-  if (isRegistered) {
-    await Location.stopGeofencingAsync(GEOFENCING_TASK_NAME);
+    if (isRegistered) {
+      try {
+        await Location.stopGeofencingAsync(GEOFENCING_TASK_NAME);
+      } catch (error) {
+        console.log("Error stopping geofencing:", error);
+      }
+    }
+  } catch (error) {
+    console.log("Error checking geofencing status:", error);
   }
 }

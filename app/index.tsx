@@ -1,19 +1,32 @@
-import { useCallback, useState } from "react";
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useState } from "react";
+import { Alert, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 import PlaceCard from "@/src/components/places/PlaceCard";
 import CreatePlaceModal from "@/src/components/places/PlaceFormModal";
+import FadeInView from "@/src/components/ui/FadeInView";
+import AnimatedPressable from "@/src/components/ui/AnimatedPressable";
 import { usePlaces } from "@/src/hooks/usePlaces";
 import { getCurrentLocation } from "@/src/services/location";
-import { router, useFocusEffect } from "expo-router";
+import { router } from "expo-router";
 import { useBackgroundPermissionPrompt } from "@/src/hooks/useBackgroundPermissionPrompt";
 import BackgroundPermissionModal from "@/src/components/BackgroundPermissionModal";
+import { theme } from "@/src/theme";
+import HomeHeader from "@/src/components/home/HomeHeader";
+import NearbyPlacesSection from "@/src/components/home/NearbyPlacesSection";
+import { useLocation } from "@/src/hooks/useLocation";
 
 export default function HomeScreen() {
   const [createModalVisible, setCreateModalVisible] = useState(false);
+  const insets = useSafeAreaInsets();
 
-  const { places, create, refresh } = usePlaces();
+  const { places, create } = usePlaces();
+  const { refreshLocation } = useLocation();
+
+  const [refreshing, setRefreshing] = useState(false);
 
   const {
     visible: permissionPromptVisible,
@@ -23,11 +36,17 @@ export default function HomeScreen() {
     handleDismiss,
   } = useBackgroundPermissionPrompt();
 
-  useFocusEffect(
-    useCallback(() => {
-      refresh();
-    }, [refresh]),
-  );
+
+  async function handleRefresh() {
+    setRefreshing(true);
+
+    try {
+      await refreshLocation();
+    } finally {
+      setRefreshing(false)
+    }
+
+  }
 
   async function handleCreatePlace(name: string, note: string, radius: number) {
     try {
@@ -44,21 +63,20 @@ export default function HomeScreen() {
 
       setCreateModalVisible(false);
       await maybeShowPrompt(wasFirstPlace, name);
-    } catch (error) {
-      console.log(error);
+    } catch {
+      Alert.alert(
+        "Kunne ikke gemme sted",
+        "Tjek at lokation er slået til, og prøv igen.",
+      );
     }
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Dine steder</Text>
-        <Text style={styles.subtitle}>
-          {places.length === 0
-            ? "Du har ikke gemt nogen steder endnu"
-            : `${places.length} sted${places.length === 1 ? "" : "er"} gemt`}
-        </Text>
-      </View>
+    <SafeAreaView
+      style={styles.container}
+      edges={["top", "left", "right"]}
+    >
+      <HomeHeader placeCount={places.length} />
 
       <BackgroundPermissionModal
         visible={permissionPromptVisible}
@@ -67,45 +85,77 @@ export default function HomeScreen() {
         onDismiss={handleDismiss}
       />
 
-      <FlatList
-        data={places}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContent}
-        ListEmptyComponent={
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyStateText}>
-              Gem dit første sted, så du kan blive mindet om det, næste gang du
-              er i nærheden.
-            </Text>
-          </View>
-        }
-        renderItem={({ item }) => (
-          <PlaceCard
-            place={item}
-            onPress={() => {
-              router.push({
-                pathname: "/places/[id]",
-                params: { id: item.id },
-              });
-            }}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh} 
           />
-        )}
-      />
+        }
+      >
+        <NearbyPlacesSection />
 
-      <View style={styles.actions}>
-        <Pressable
+        <Text style={styles.sectionTitle}>
+          Mine steder
+        </Text>
+
+        {places.length === 0 ? (
+          <FadeInView
+            delay={80}
+            style={styles.emptyState}
+          >
+            <Text style={styles.emptyStateText}>
+              Gem dit første sted, så du kan blive mindet om det,
+              næste gang du er i nærheden.
+            </Text>
+          </FadeInView>
+        ) : (
+          places.map((item, index) => (
+            <FadeInView
+              key={item.id}
+              delay={index * 50}
+            >
+              <PlaceCard
+                place={item}
+                onPress={() => {
+                  router.push({
+                    pathname: "/places/[id]",
+                    params: { id: item.id },
+                  });
+                }}
+              />
+            </FadeInView>
+          ))
+        )}
+      </ScrollView>
+
+      <View
+        style={[
+          styles.actions,
+          {
+            paddingBottom: Math.max(insets.bottom, 20),
+          },
+        ]}
+      >
+        <AnimatedPressable
           style={styles.secondaryButton}
           onPress={() => router.push("/map")}
         >
-          <Text style={styles.secondaryButtonText}>Åbn kort</Text>
-        </Pressable>
+          <Text style={styles.secondaryButtonText}>
+            Åbn kort
+          </Text>
+        </AnimatedPressable>
 
-        <Pressable
+        <AnimatedPressable
           style={styles.primaryButton}
           onPress={() => setCreateModalVisible(true)}
         >
-          <Text style={styles.primaryButtonText}>+ Gem nyt sted</Text>
-        </Pressable>
+          <Text style={styles.primaryButtonText}>
+            + Gem nu sted
+          </Text>
+        </AnimatedPressable>
       </View>
 
       <CreatePlaceModal
@@ -117,85 +167,76 @@ export default function HomeScreen() {
   );
 }
 
-const colors = {
-  background: "#F7F7F5",
-  surface: "#FFFFFF",
-  primary: "#2F6F4F",
-  primaryText: "#FFFFFF",
-  textPrimary: "#1A1A1A",
-  textSecondary: "#6B6B6B",
-  border: "#E5E5E1",
-};
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: theme.colors.background,
   },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 8,
+
+  scrollContent: {
+    paddingBottom: 140,
   },
-  title: {
-    fontSize: 28,
+
+  sectionTitle: {
+    paddingHorizontal: theme.spacing.xl,
+    marginTop: theme.spacing.lg,
+    marginBottom: theme.spacing.md,
+    fontSize: 18,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: theme.colors.textPrimary,
   },
-  subtitle: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginTop: 4,
-  },
-  listContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 100,
-    gap: 12,
-    flexGrow: 1,
-  },
+
   emptyState: {
-    marginTop: 60,
-    paddingHorizontal: 20,
+    marginTop: 40,
+    paddingHorizontal: theme.spacing.xl,
   },
+
   emptyStateText: {
     textAlign: "center",
     fontSize: 15,
-    color: colors.textSecondary,
+    color: theme.colors.textSecondary,
     lineHeight: 22,
   },
+
   actions: {
     position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
     flexDirection: "row",
-    gap: 12,
-    padding: 20,
-    backgroundColor: colors.background,
+    gap: theme.spacing.md,
+    paddingHorizontal: theme.spacing.xl,
+    paddingTop: theme.spacing.md,
+    backgroundColor: theme.colors.background,
   },
+
   primaryButton: {
     flex: 1,
-    backgroundColor: colors.primary,
-    paddingVertical: 14,
-    borderRadius: 12,
+    backgroundColor: theme.colors.primary,
+    paddingVertical: 15,
+    borderRadius: theme.radius.md,
     alignItems: "center",
+    ...theme.shadow.card,
   },
+
   primaryButtonText: {
-    color: colors.primaryText,
+    color: theme.colors.primaryText,
     fontSize: 16,
     fontWeight: "600",
   },
+
   secondaryButton: {
     flex: 1,
-    backgroundColor: colors.surface,
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
-    paddingVertical: 14,
-    borderRadius: 12,
+    borderColor: theme.colors.border,
+    paddingVertical: 15,
+    borderRadius: theme.radius.md,
     alignItems: "center",
   },
+
   secondaryButtonText: {
-    color: colors.textPrimary,
+    color: theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: "600",
   },

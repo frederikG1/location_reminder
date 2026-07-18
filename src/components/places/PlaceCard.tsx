@@ -1,5 +1,7 @@
 import { Place } from "@/src/models/Place";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import AnimatedPressable from "@/src/components/ui/AnimatedPressable";
+import { theme } from "@/src/theme";
+import { StyleSheet, Text, View } from "react-native";
 
 type Props = {
   place: Place;
@@ -8,10 +10,7 @@ type Props = {
 
 export default function PlaceCard({ place, onPress }: Props) {
   return (
-    <Pressable
-      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-      onPress={onPress}
-    >
+    <AnimatedPressable style={styles.card} onPress={onPress}>
       <View style={styles.row}>
         <Text style={styles.title} numberOfLines={1}>
           {place.name}
@@ -30,63 +29,49 @@ export default function PlaceCard({ place, onPress }: Props) {
       <Text style={styles.date}>
         Gemt {new Date(place.createdAt).toLocaleDateString("da-DK")}
       </Text>
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 
-const colors = {
-  surface: "#FFFFFF",
-  border: "#E5E5E1",
-  textPrimary: "#1A1A1A",
-  textSecondary: "#6B6B6B",
-  textMuted: "#9B9B95",
-  badgeBg: "#E8F1EC",
-  badgeText: "#1D6B4B",
-};
-
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
-    padding: 16,
-  },
-  cardPressed: {
-    backgroundColor: "#FAFAF8",
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.lg,
+    ...theme.shadow.card,
   },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    gap: 8,
+    gap: theme.spacing.sm,
   },
   title: {
     flex: 1,
     fontSize: 18,
     fontWeight: "600",
-    color: colors.textPrimary,
+    color: theme.colors.textPrimary,
   },
   badge: {
-    backgroundColor: colors.badgeBg,
+    backgroundColor: theme.colors.primaryMuted,
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: theme.radius.sm,
   },
   badgeText: {
     fontSize: 12,
     fontWeight: "600",
-    color: colors.badgeText,
+    color: theme.colors.primary,
   },
   note: {
-    marginTop: 8,
+    marginTop: theme.spacing.sm,
     fontSize: 14,
     lineHeight: 20,
-    color: colors.textSecondary,
+    color: theme.colors.textSecondary,
   },
   date: {
-    marginTop: 12,
+    marginTop: theme.spacing.md,
     fontSize: 12,
-    color: colors.textMuted,
+    color: theme.colors.textMuted,
   },
 });

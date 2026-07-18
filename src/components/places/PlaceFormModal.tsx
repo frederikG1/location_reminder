@@ -1,7 +1,22 @@
-import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput } from "react-native";
+import AnimatedPressable from "@/src/components/ui/AnimatedPressable";
+import { theme } from "@/src/theme";
+import {
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+} from "react-native";
 import { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Slider from "@react-native-community/slider";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withSpring,
+} from "react-native-reanimated";
 
 type Props = {
   visible: boolean;
@@ -23,6 +38,7 @@ export default function CreatePlaceModal({
   const [name, setName] = useState(initialName ?? "");
   const [note, setNote] = useState(initialNote ?? "");
   const [radius, setRadius] = useState(initialRadius ?? 200);
+  const radiusScale = useSharedValue(1);
 
   useEffect(() => {
     setName(initialName ?? "");
@@ -30,21 +46,34 @@ export default function CreatePlaceModal({
     setRadius(initialRadius ?? 200);
   }, [initialName, initialNote, initialRadius, visible]);
 
+  const radiusAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: radiusScale.value }],
+  }));
+
   const isEditing = Boolean(initialName);
   const canSave = name.trim().length > 0;
 
   return (
-    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
+    <Modal
+      visible={visible}
+      animationType="slide"
+      presentationStyle="pageSheet"
+    >
       <SafeAreaView style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-          <Text style={styles.heading}>{isEditing ? "Rediger sted" : "Gem sted"}</Text>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
+          <Text style={styles.heading}>
+            {isEditing ? "Rediger sted" : "Gem sted"}
+          </Text>
 
           <Text style={styles.label}>Navn</Text>
           <TextInput
             value={name}
             onChangeText={setName}
             placeholder="Fx Café Norden"
-            placeholderTextColor="#9B9B95"
+            placeholderTextColor={theme.colors.textMuted}
             style={styles.input}
           />
 
@@ -53,32 +82,39 @@ export default function CreatePlaceModal({
             value={note}
             onChangeText={setNote}
             placeholder="Hvorfor vil du huske dette sted?"
-            placeholderTextColor="#9B9B95"
+            placeholderTextColor={theme.colors.textMuted}
             style={[styles.input, styles.noteInput]}
             multiline
           />
 
           <Text style={styles.label}>Påmind mig indenfor</Text>
-          <Text style={styles.radiusValue}>{radius}m</Text>
+          <Animated.Text style={[styles.radiusValue, radiusAnimatedStyle]}>
+            {radius}m
+          </Animated.Text>
           <Slider
             minimumValue={50}
             maximumValue={500}
             step={50}
             value={radius}
-            onValueChange={setRadius}
-            minimumTrackTintColor="#2F6F4F"
-            maximumTrackTintColor="#E5E5E1"
-            thumbTintColor="#2F6F4F"
+            onValueChange={(value) => {
+              setRadius(value);
+            }}
+            minimumTrackTintColor={theme.colors.primary}
+            maximumTrackTintColor={theme.colors.border}
+            thumbTintColor={theme.colors.primary}
           />
         </ScrollView>
 
-        <Pressable
-          style={[styles.primaryButton, !canSave && styles.primaryButtonDisabled]}
+        <AnimatedPressable
+          style={[
+            styles.primaryButton,
+            !canSave && styles.primaryButtonDisabled,
+          ]}
           disabled={!canSave}
           onPress={() => onSave(name, note, radius)}
         >
           <Text style={styles.primaryButtonText}>Gem</Text>
-        </Pressable>
+        </AnimatedPressable>
 
         <Pressable style={styles.cancelButton} onPress={onClose}>
           <Text style={styles.cancelButtonText}>Annuller</Text>
@@ -88,69 +124,60 @@ export default function CreatePlaceModal({
   );
 }
 
-const colors = {
-  background: "#FFFFFF",
-  primary: "#2F6F4F",
-  textPrimary: "#1A1A1A",
-  textSecondary: "#6B6B6B",
-  border: "#E5E5E1",
-  inputBg: "#F7F7F5",
-};
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
-    padding: 20,
+    backgroundColor: theme.colors.surface,
+    padding: theme.spacing.xl,
   },
   scrollContent: {
-    paddingBottom: 20,
+    paddingBottom: theme.spacing.xl,
   },
   heading: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: "700",
-    color: colors.textPrimary,
-    marginBottom: 20,
+    color: theme.colors.textPrimary,
+    marginBottom: theme.spacing.xl,
   },
   label: {
     fontSize: 14,
     fontWeight: "600",
-    color: colors.textSecondary,
+    color: theme.colors.textSecondary,
     marginBottom: 6,
-    marginTop: 16,
+    marginTop: theme.spacing.lg,
   },
   input: {
-    backgroundColor: colors.inputBg,
+    backgroundColor: theme.colors.inputBg,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.colors.border,
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 16,
-    color: colors.textPrimary,
+    color: theme.colors.textPrimary,
   },
   noteInput: {
     minHeight: 80,
     textAlignVertical: "top",
   },
   radiusValue: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "700",
-    color: colors.primary,
-    marginBottom: 8,
+    color: theme.colors.primary,
+    marginBottom: theme.spacing.sm,
   },
   primaryButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: theme.colors.primary,
     paddingVertical: 15,
-    borderRadius: 12,
+    borderRadius: theme.radius.md,
     alignItems: "center",
-    marginTop: 12,
+    marginTop: theme.spacing.md,
   },
   primaryButtonDisabled: {
     opacity: 0.4,
   },
   primaryButtonText: {
-    color: "#FFFFFF",
+    color: theme.colors.primaryText,
     fontSize: 16,
     fontWeight: "600",
   },
@@ -159,7 +186,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   cancelButtonText: {
-    color: colors.textSecondary,
+    color: theme.colors.textSecondary,
     fontSize: 15,
     fontWeight: "500",
   },

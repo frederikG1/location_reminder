@@ -1,16 +1,31 @@
-import { useCallback, useEffect, useState } from "react";
 import { Place } from "@/src/models/Place";
-import * as placeRepository from "@/src/services/placeRepository";
-import * as Crypto from "expo-crypto";
 import { syncGeofences } from "@/src/services/geofencing";
 import { hasBackgroundLocationPermission } from "@/src/services/location";
+import * as placeRepository from "@/src/services/placeRepository";
+import * as Crypto from "expo-crypto";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+let geofencesSynced = false;
 
 export function usePlaces() {
   const [places, setPlaces] = useState<Place[]>([]);
+  const prevPlacesRef = useRef<Place[]>([]);
 
   const refresh = useCallback(async () => {
     const loadedPlaces = await placeRepository.getPlaces();
-    setPlaces(loadedPlaces);
+
+    // Only update state if places actually changed
+    const placesChanged =
+      loadedPlaces.length !== prevPlacesRef.current.length ||
+      loadedPlaces.some(
+        (place, index) => place.id !== prevPlacesRef.current[index]?.id,
+      );
+
+    if (placesChanged) {
+      setPlaces(loadedPlaces);
+    }
+
+    prevPlacesRef.current = loadedPlaces;
   }, []);
 
   type CreatePlaceInput = {
@@ -32,23 +47,20 @@ export function usePlaces() {
       createdAt: new Date().toISOString(),
     };
 
-    try {
-      await placeRepository.savePlace(place);
-      await refresh();
-    } catch (error) {
-      console.log("Failed creating place", error);
-    }
+    await placeRepository.savePlace(place);
+    geofencesSynced = false;
+    await refresh();
   };
 
   const remove = async (id: string) => {
     await placeRepository.deletePlace(id);
-
+    geofencesSynced = false;
     await refresh();
   };
 
   const update = async (updatedPlace: Place) => {
     await placeRepository.updatePlace(updatedPlace);
-
+    geofencesSynced = false;
     await refresh();
   };
 
@@ -56,12 +68,17 @@ export function usePlaces() {
     refresh();
   }, [refresh]);
 
-  //Syncer geofences hver gang listen af steder ændrer sig
+  // Only sync geofences once on startup, then after manual changes
   useEffect(() => {
+    if (geofencesSynced) {
+      return;
+    }
+
     (async () => {
       const hasPermission = await hasBackgroundLocationPermission();
       if (hasPermission) {
         await syncGeofences(places);
+        geofencesSynced = true;
       }
     })();
   }, [places]);

@@ -1,4 +1,7 @@
-import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import AnimatedPressable from "@/src/components/ui/AnimatedPressable";
+import FadeInView from "@/src/components/ui/FadeInView";
+import { theme } from "@/src/theme";
+import { Modal, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type Props = {
@@ -17,65 +20,64 @@ export default function BackgroundPermissionModal({
   return (
     <Modal visible={visible} animationType="fade" transparent>
       <View style={styles.overlay}>
-        <SafeAreaView style={styles.card}>
-          <Text style={styles.heading}>Vil du mindes om {placeName}?</Text>
-          <Text style={styles.body}>
-            Tillad lokation i baggrunden, så vi kan give dig en påmindelse,
-            næste gang du er i nærheden - også selvom appen ikke er åben.
-          </Text>
+        <FadeInView style={styles.cardWrapper}>
+          <SafeAreaView style={styles.card}>
+            <Text style={styles.heading}>Vil du mindes om {placeName}?</Text>
+            <Text style={styles.body}>
+              Tillad lokation i baggrunden, så vi kan give dig en påmindelse,
+              næste gang du er i nærheden — også selvom appen ikke er åben.
+            </Text>
 
-          <Pressable style={styles.primaryButton} onPress={onAccept}>
-            <Text style={styles.primaryButtonText}>Ja, giv adgang</Text>
-          </Pressable>
+            <AnimatedPressable style={styles.primaryButton} onPress={onAccept}>
+              <Text style={styles.primaryButtonText}>Ja, giv adgang</Text>
+            </AnimatedPressable>
 
-          <Pressable style={styles.dismissButton} onPress={onDismiss}>
-            <Text style={styles.dismissButtonText}>Ikke nu</Text>
-          </Pressable>
-        </SafeAreaView>
+            <AnimatedPressable style={styles.dismissButton} onPress={onDismiss} haptic={false}>
+              <Text style={styles.dismissButtonText}>Ikke nu</Text>
+            </AnimatedPressable>
+          </SafeAreaView>
+        </FadeInView>
       </View>
     </Modal>
   );
 }
 
-const colors = {
-  surface: "#FFFFFF",
-  primary: "#2F6F4F",
-  textPrimary: "#1A1A1A",
-  textSecondary: "#6B6B6B",
-};
-
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.45)",
+    backgroundColor: theme.colors.overlay,
     justifyContent: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: theme.spacing.xl,
+  },
+  cardWrapper: {
+    width: "100%",
   },
   card: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 24,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.xxl,
+    ...theme.shadow.floating,
   },
   heading: {
     fontSize: 20,
     fontWeight: "700",
-    color: colors.textPrimary,
-    marginBottom: 12,
+    color: theme.colors.textPrimary,
+    marginBottom: theme.spacing.md,
   },
   body: {
     fontSize: 15,
     lineHeight: 22,
-    color: colors.textSecondary,
-    marginBottom: 24,
+    color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.xxl,
   },
   primaryButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: theme.colors.primary,
     paddingVertical: 14,
-    borderRadius: 12,
+    borderRadius: theme.radius.md,
     alignItems: "center",
   },
   primaryButtonText: {
-    color: "#FFFFFF",
+    color: theme.colors.primaryText,
     fontSize: 16,
     fontWeight: "600",
   },
@@ -84,7 +86,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   dismissButtonText: {
-    color: colors.textSecondary,
+    color: theme.colors.textSecondary,
     fontSize: 15,
     fontWeight: "500",
   },
