@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Alert, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -36,16 +43,14 @@ export default function HomeScreen() {
     handleDismiss,
   } = useBackgroundPermissionPrompt();
 
-
   async function handleRefresh() {
     setRefreshing(true);
 
     try {
       await refreshLocation();
     } finally {
-      setRefreshing(false)
+      setRefreshing(false);
     }
-
   }
 
   async function handleCreatePlace(name: string, note: string, radius: number) {
@@ -72,10 +77,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <SafeAreaView
-      style={styles.container}
-      edges={["top", "left", "right"]}
-    >
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <HomeHeader placeCount={places.length} />
 
       <BackgroundPermissionModal
@@ -89,34 +91,23 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh} 
-          />
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
       >
         <NearbyPlacesSection />
 
-        <Text style={styles.sectionTitle}>
-          Mine steder
-        </Text>
+        <Text style={styles.sectionTitle}>Mine steder</Text>
 
         {places.length === 0 ? (
-          <FadeInView
-            delay={80}
-            style={styles.emptyState}
-          >
+          <FadeInView delay={80} style={styles.emptyState}>
             <Text style={styles.emptyStateText}>
-              Gem dit første sted, så du kan blive mindet om det,
-              næste gang du er i nærheden.
+              Gem dit første sted, så du kan blive mindet om det, næste gang du
+              er i nærheden.
             </Text>
           </FadeInView>
         ) : (
           places.map((item, index) => (
-            <FadeInView
-              key={item.id}
-              delay={index * 50}
-            >
+            <FadeInView key={item.id} delay={index * 50}>
               <PlaceCard
                 place={item}
                 onPress={() => {
@@ -143,18 +134,14 @@ export default function HomeScreen() {
           style={styles.secondaryButton}
           onPress={() => router.push("/map")}
         >
-          <Text style={styles.secondaryButtonText}>
-            Åbn kort
-          </Text>
+          <Text style={styles.secondaryButtonText}>Åbn kort</Text>
         </AnimatedPressable>
 
         <AnimatedPressable
           style={styles.primaryButton}
           onPress={() => setCreateModalVisible(true)}
         >
-          <Text style={styles.primaryButtonText}>
-            + Gem nu sted
-          </Text>
+          <Text style={styles.primaryButtonText}>+ Gem nyt sted</Text>
         </AnimatedPressable>
       </View>
 

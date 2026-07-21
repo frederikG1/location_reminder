@@ -1,4 +1,4 @@
-import NearbyPlacesList from "@/src/components/places/NearbyPlacesList";
+import NearbyPlacesList from "@/src/components/places/NearbyPlacesMapList";
 import FadeInView from "@/src/components/ui/FadeInView";
 import { useLocation } from "@/src/hooks/useLocation";
 import { usePlaces } from "@/src/hooks/usePlaces";

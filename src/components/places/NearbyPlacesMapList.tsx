@@ -16,7 +16,7 @@ export default function NearbyPlacesList({ places }: Props) {
 
   return (
     <FadeInView style={styles.container}>
-      <Text style={styles.heading}>I nærheden nu</Text>
+      
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
