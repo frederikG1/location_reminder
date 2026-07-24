@@ -59,6 +59,7 @@ export default function CreatePlaceModal({
       animationType="slide"
       presentationStyle="pageSheet"
     >
+      
       <SafeAreaView style={styles.container}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -116,9 +117,9 @@ export default function CreatePlaceModal({
           <Text style={styles.primaryButtonText}>Gem</Text>
         </AnimatedPressable>
 
-        <Pressable style={styles.cancelButton} onPress={onClose}>
+        <AnimatedPressable style={styles.cancelButton} onPress={onClose}>
           <Text style={styles.cancelButtonText}>Annuller</Text>
-        </Pressable>
+        </AnimatedPressable>
       </SafeAreaView>
     </Modal>
   );

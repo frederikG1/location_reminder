@@ -19,6 +19,7 @@
     "@react-navigation/elements": "^2.6.3",
     "@react-navigation/native": "^7.1.8",
     "babel-preset-expo": "~54.0.10",
+    "dayjs": "^1.11.21",
     "expo": "~54.0.34",
     "expo-constants": "~18.0.13",
     "expo-crypto": "~15.0.9",
@@ -45,7 +46,9 @@
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",
     "react-native-web": "~0.21.0",
-    "react-native-worklets": "0.5.1"
+    "react-native-worklets": "0.5.1",
+    "react-timeago": "^8.3.0",
+    "scripts": "^0.1.0"
   },
   "devDependencies": {
     "@types/react": "~19.1.0",

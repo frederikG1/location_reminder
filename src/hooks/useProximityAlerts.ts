@@ -14,7 +14,7 @@ export function useProximityAlerts(onEnterRadius: (place: Place) => void) {
 
   useEffect(() => {
     // Only notify for newly nearby places (not previously notified)
-    nearbyPlaces.forEach((place) => {
+    nearbyPlaces.forEach(({ place }) => {
       if (!notifiedIds.current.has(place.id)) {
         notifiedIds.current.add(place.id);
         onEnterRadiusRef.current(place);

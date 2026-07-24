@@ -24,6 +24,6 @@ export function getProximityStatus(distance: number): ProximityStatus {
   return {
     label: "I nærheden",
     emoji: "📍",
-    color: "0A84FF",
+    color: "#0A84FF",
   };
 }

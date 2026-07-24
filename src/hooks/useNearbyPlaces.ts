@@ -19,7 +19,7 @@ export function useNearbyPlaces() {
           place.latitude,
           place.longitude,
         );
-
+        
         return {
           place,
           distance,

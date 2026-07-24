@@ -1,12 +1,15 @@
 import { Text, StyleSheet } from "react-native";
 import FadeInView from "../ui/FadeInView";
 import { theme } from "@/src/theme";
+import { getHomeMessage } from "@/src/util/getHomeMessage";
 
 type HomeHeaderProps = {
   placeCount: number;
+  nearbyPlacesCount: number;
+  nearestPlaceName?: string;
 };
 
-export default function HomeHeader({ placeCount }: HomeHeaderProps) {
+export default function HomeHeader({ placeCount, nearbyPlacesCount, nearestPlaceName }: HomeHeaderProps) {
   function getGreeting() {
     const hour = new Date().getHours();
 
@@ -20,9 +23,7 @@ export default function HomeHeader({ placeCount }: HomeHeaderProps) {
     <FadeInView style={styles.header}>
       <Text style={styles.title}>{getGreeting()} 👋</Text>
       <Text style={styles.subtitle}>
-        {placeCount === 0
-          ? "Du har ikke gemt nogen steder endnu"
-          : `Du har gemt ${placeCount} sted${placeCount === 1 ? "" : "er"} `}
+        {getHomeMessage(nearbyPlacesCount, nearestPlaceName)}
       </Text>
     </FadeInView>
   );

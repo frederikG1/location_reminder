@@ -25,6 +25,7 @@ import { theme } from "@/src/theme";
 import HomeHeader from "@/src/components/home/HomeHeader";
 import NearbyPlacesSection from "@/src/components/home/NearbyPlacesSection";
 import { useLocation } from "@/src/hooks/useLocation";
+import { useNearbyPlaces } from "@/src/hooks/useNearbyPlaces";
 
 export default function HomeScreen() {
   const [createModalVisible, setCreateModalVisible] = useState(false);
@@ -32,6 +33,7 @@ export default function HomeScreen() {
 
   const { places, create } = usePlaces();
   const { refreshLocation } = useLocation();
+  const nearbyPlaces = useNearbyPlaces();
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -78,7 +80,11 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
-      <HomeHeader placeCount={places.length} />
+      <HomeHeader
+        placeCount={places.length}
+        nearbyPlacesCount={nearbyPlaces.length}
+        nearestPlaceName={nearbyPlaces[0]?.place.name}
+      />
 
       <BackgroundPermissionModal
         visible={permissionPromptVisible}
