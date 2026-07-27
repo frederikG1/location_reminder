@@ -19,6 +19,19 @@ export async function getCurrentLocation() {
   };
 }
 
+export async function requestForegroundLocationPermission() {
+  const { status } = await Location.getForegroundPermissionsAsync();
+
+  if (status === "granted") {
+    return true;
+  }
+
+  const { status: requested } =
+    await Location.requestForegroundPermissionsAsync();
+
+  return requested === "granted";
+}
+
 export async function requestBackgroundLocationPermission() {
   const { status: foregroundStatus } =
     await Location.getForegroundPermissionsAsync();

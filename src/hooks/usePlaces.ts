@@ -9,6 +9,7 @@ let geofencesSynced = false;
 
 export function usePlaces() {
   const [places, setPlaces] = useState<Place[]>([]);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const prevPlacesRef = useRef<Place[]>([]);
 
   const refresh = useCallback(async () => {
@@ -26,6 +27,7 @@ export function usePlaces() {
     }
 
     prevPlacesRef.current = loadedPlaces;
+    setHasLoaded(true);
   }, []);
 
   type CreatePlaceInput = {
@@ -68,9 +70,11 @@ export function usePlaces() {
     refresh();
   }, [refresh]);
 
-  // Only sync geofences once on startup, then after manual changes
+  // Only sync geofences once on startup, then after manual changes.
+  // Waits for the first load — syncing the empty initial state would latch the
+  // flag and leave the stored places unarmed.
   useEffect(() => {
-    if (geofencesSynced) {
+    if (!hasLoaded || geofencesSynced) {
       return;
     }
 
@@ -81,7 +85,7 @@ export function usePlaces() {
         geofencesSynced = true;
       }
     })();
-  }, [places]);
+  }, [places, hasLoaded]);
 
   return {
     places,

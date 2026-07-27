@@ -1,22 +1,16 @@
 import { StyleSheet, Text, View } from "react-native";
 
 import { theme } from "@/src/theme";
-import { useNearbyPlaces } from "@/src/hooks/useNearbyPlaces";
+import type { NearbyPlace } from "@/src/hooks/useNearbyPlaces";
 import FadeInView from "../ui/FadeInView";
 import { router } from "expo-router";
 import AnimatedPressable from "../ui/AnimatedPressable";
 
-export default function NearbyPlacesSection() {
-  const nearbyPlaces = useNearbyPlaces();
+type Props = {
+  nearbyPlaces: NearbyPlace[];
+};
 
-  //   function formatDistance(distance: number) {
-  //     if (distance < 1000) {
-  //       return `${Math.round(distance)} m væk`;
-  //     }
-
-  //     return `${(distance / 1000).toFixed(1)} km væk`;
-  //   }
-
+export default function NearbyPlacesSection({ nearbyPlaces }: Props) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>I nærheden</Text>
@@ -30,7 +24,7 @@ export default function NearbyPlacesSection() {
           </Text>
         </View>
       ) : (
-        nearbyPlaces.map(({ place, distance, status }, index) => (
+        nearbyPlaces.map(({ place, status }, index) => (
           <FadeInView key={place.id} delay={index * 70}>
             <AnimatedPressable
               style={styles.card}
@@ -82,6 +76,8 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: theme.colors.surface,
     borderRadius: theme.radius.md,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
     padding: theme.spacing.md,
     marginBottom: theme.spacing.sm,
     ...theme.shadow.card,
@@ -109,6 +105,8 @@ const styles = StyleSheet.create({
   emptyCard: {
     backgroundColor: theme.colors.surface,
     borderRadius: theme.radius.md,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
     padding: theme.spacing.lg,
   },
 

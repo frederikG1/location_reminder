@@ -30,15 +30,6 @@ export default function PlaceDetailScreen() {
         <Text style={styles.title}>{place.name}</Text>
 
         {place.note ? <Text style={styles.note}>{place.note}</Text> : null}
-
-        <View style={styles.metaRow}>
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{place.radius}m radius</Text>
-          </View>
-          <Text style={styles.date}>
-            Gemt {new Date(place.createdAt).toLocaleDateString("da-DK")}
-          </Text>
-        </View>
       </FadeInView>
 
       <View style={[styles.actions, { paddingBottom: Math.max(insets.bottom, 20) }]}>
@@ -119,36 +110,12 @@ const styles = StyleSheet.create({
     padding: theme.spacing.xl,
   },
   title: {
-    fontSize: 28,
-    fontWeight: "700",
+    ...theme.typography.title,
     color: theme.colors.textPrimary,
-    letterSpacing: -0.3,
   },
   note: {
-    marginTop: 10,
-    fontSize: 16,
-    lineHeight: 24,
-    color: theme.colors.textSecondary,
-  },
-  metaRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    marginTop: theme.spacing.xl,
-  },
-  badge: {
-    backgroundColor: theme.colors.primaryMuted,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: theme.radius.sm,
-  },
-  badgeText: {
-    color: theme.colors.primary,
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  date: {
-    fontSize: 13,
+    ...theme.typography.body,
+    marginTop: theme.spacing.sm,
     color: theme.colors.textSecondary,
   },
   notFound: {
@@ -169,10 +136,10 @@ const styles = StyleSheet.create({
   secondaryButton: {
     flex: 1,
     backgroundColor: theme.colors.surface,
-    borderWidth: 1,
+    borderWidth: theme.borderWidth,
     borderColor: theme.colors.border,
     paddingVertical: 15,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.button,
     alignItems: "center",
   },
   secondaryButtonText: {
@@ -182,13 +149,15 @@ const styles = StyleSheet.create({
   },
   destructiveButton: {
     flex: 1,
-    backgroundColor: theme.colors.dangerMuted,
+    backgroundColor: theme.colors.danger,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
     paddingVertical: 15,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.button,
     alignItems: "center",
   },
   destructiveButtonText: {
-    color: theme.colors.danger,
+    color: theme.colors.surface,
     fontSize: 16,
     fontWeight: "600",
   },

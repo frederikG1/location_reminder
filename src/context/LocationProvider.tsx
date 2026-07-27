@@ -20,6 +20,7 @@ type LocationContextValue = {
   isLoading: boolean;
   error: string | null;
   refreshLocation: () => Promise<void>;
+  startWatching: () => Promise<void>;
 };
 
 const LocationContext = createContext<LocationContextValue | null>(null);
@@ -29,6 +30,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const subscriptionRef = useRef<Location.LocationSubscription | null>(null);
+  const isMountedRef = useRef(true);
 
   const refreshLocation = useCallback(async () => {
     try {
@@ -51,53 +53,60 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  useEffect(() => {
-    let isMounted = true;
-
-    async function startWatching() {
-      try {
-        const { status } = await Location.getForegroundPermissionsAsync();
-        if (status !== "granted") {
-          const { status: requested } =
-            await Location.requestForegroundPermissionsAsync();
-          if (requested !== "granted") {
-            throw new Error("Location permission denied");
-          }
-        }
-
-        subscriptionRef.current = await Location.watchPositionAsync(
-          { accuracy: Location.Accuracy.Balanced, distanceInterval: 10 },
-          (position) => {
-            if (isMounted) {
-              setLocation({
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-              });
-              setIsLoading(false);
-            }
-          },
-        );
-      } catch (err) {
-        if (isMounted) {
-          setError(
-            err instanceof Error ? err.message : "Kunne ikke hente lokation",
-          );
-          setIsLoading(false);
-        }
-      }
+  // Never requests permission itself — the first-run flow asks for it at the
+  // moment the user asks to see the map, and calls startWatching() after.
+  const startWatching = useCallback(async () => {
+    if (subscriptionRef.current) {
+      return;
     }
 
+    try {
+      const { status } = await Location.getForegroundPermissionsAsync();
+
+      if (status !== "granted") {
+        setIsLoading(false);
+        return;
+      }
+
+      subscriptionRef.current = await Location.watchPositionAsync(
+        { accuracy: Location.Accuracy.Balanced, distanceInterval: 10 },
+        (position) => {
+          if (!isMountedRef.current) {
+            return;
+          }
+
+          setLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+          setError(null);
+          setIsLoading(false);
+        },
+      );
+    } catch (err) {
+      if (isMountedRef.current) {
+        setError(
+          err instanceof Error ? err.message : "Kunne ikke hente lokation",
+        );
+        setIsLoading(false);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    isMountedRef.current = true;
     startWatching();
 
     return () => {
-      isMounted = false;
+      isMountedRef.current = false;
       subscriptionRef.current?.remove();
+      subscriptionRef.current = null;
     };
-  }, []);
+  }, [startWatching]);
 
   const value = useMemo(
-    () => ({ location, isLoading, error, refreshLocation }),
-    [location, isLoading, error, refreshLocation],
+    () => ({ location, isLoading, error, refreshLocation, startWatching }),
+    [location, isLoading, error, refreshLocation, startWatching],
   );
 
   return (

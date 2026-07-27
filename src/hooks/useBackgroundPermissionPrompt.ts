@@ -1,46 +1,62 @@
-import { useState } from "react";
-import { requestBackgroundLocationPermission } from "../services/location";
-import { requestNotificationPermissions } from "../services/notifications";
+import { useCallback, useEffect, useState } from "react";
+import { AppState, Linking } from "react-native";
 import {
-  hasAskedBackgroundPermission,
-  markAskedForBackgroundPermission,
-} from "../services/onboarding";
+  hasBackgroundLocationPermission,
+  requestBackgroundLocationPermission,
+} from "../services/location";
+import { requestNotificationPermissions } from "../services/notifications";
 
+/**
+ * Drives the "reminders are off" path on the home screen. Keyed off the real
+ * permission state rather than a one-shot flag, so someone who chose "kun når
+ * appen er åben" during the first run always has a way back — and the prompt
+ * disappears by itself once they grant it.
+ */
 export function useBackgroundPermissionPrompt() {
+  const [isGranted, setIsGranted] = useState<boolean | null>(null);
   const [visible, setVisible] = useState(false);
-  const [placeName, setPlaceName] = useState("");
 
-  async function maybeShowPrompt(wasFirstPlace: boolean, name: string) {
-    if (!wasFirstPlace) {
-      return;
-    }
-    const alreadyAsked = await hasAskedBackgroundPermission();
+  const refresh = useCallback(async () => {
+    setIsGranted(await hasBackgroundLocationPermission());
+  }, []);
 
-    if (alreadyAsked) {
-      return;
-    }
+  useEffect(() => {
+    refresh();
 
-    setPlaceName(name);
-    setVisible(true);
-  }
+    // They may have flipped it in Settings while we were backgrounded.
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state === "active") {
+        refresh();
+      }
+    });
+
+    return () => subscription.remove();
+  }, [refresh]);
 
   async function handleAccept() {
     try {
       const granted = await requestBackgroundLocationPermission();
-      console.log("Background permission result:", granted);
-      await requestNotificationPermissions();
-    } catch (error) {
-      console.log("Error in handleAccept:", error);
+
+      if (granted) {
+        await requestNotificationPermissions();
+        setIsGranted(true);
+      } else {
+        // Once denied, the OS will not ask again — Settings is the only route.
+        await Linking.openSettings();
+      }
+    } catch {
+      await Linking.openSettings();
     } finally {
-      await markAskedForBackgroundPermission();
       setVisible(false);
     }
   }
 
-  async function handleDismiss() {
-    await markAskedForBackgroundPermission();
-    setVisible(false);
-  }
-
-  return { visible, placeName, maybeShowPrompt, handleAccept, handleDismiss };
+  return {
+    /** Null until the first check resolves, so nothing flashes on mount. */
+    needsPermission: isGranted === false,
+    visible,
+    show: () => setVisible(true),
+    handleAccept,
+    handleDismiss: () => setVisible(false),
+  };
 }

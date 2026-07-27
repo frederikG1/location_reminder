@@ -4,12 +4,14 @@ import { theme } from "@/src/theme";
 import { getHomeMessage } from "@/src/util/getHomeMessage";
 
 type HomeHeaderProps = {
-  placeCount: number;
   nearbyPlacesCount: number;
   nearestPlaceName?: string;
 };
 
-export default function HomeHeader({ placeCount, nearbyPlacesCount, nearestPlaceName }: HomeHeaderProps) {
+export default function HomeHeader({
+  nearbyPlacesCount,
+  nearestPlaceName,
+}: HomeHeaderProps) {
   function getGreeting() {
     const hour = new Date().getHours();
 

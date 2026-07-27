@@ -6,14 +6,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 type Props = {
   visible: boolean;
-  placeName: string;
   onAccept: () => void;
   onDismiss: () => void;
 };
 
 export default function BackgroundPermissionModal({
   visible,
-  placeName,
   onAccept,
   onDismiss,
 }: Props) {
@@ -22,7 +20,7 @@ export default function BackgroundPermissionModal({
       <View style={styles.overlay}>
         <FadeInView style={styles.cardWrapper}>
           <SafeAreaView style={styles.card}>
-            <Text style={styles.heading}>Vil du mindes om {placeName}?</Text>
+            <Text style={styles.heading}>Slå påmindelser til</Text>
             <Text style={styles.body}>
               Tillad lokation i baggrunden, så vi kan give dig en påmindelse,
               næste gang du er i nærheden — også selvom appen ikke er åben.
@@ -55,6 +53,8 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: theme.colors.surface,
     borderRadius: theme.radius.lg,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
     padding: theme.spacing.xxl,
     ...theme.shadow.floating,
   },
@@ -73,7 +73,9 @@ const styles = StyleSheet.create({
   primaryButton: {
     backgroundColor: theme.colors.primary,
     paddingVertical: 14,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.button,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
     alignItems: "center",
   },
   primaryButtonText: {

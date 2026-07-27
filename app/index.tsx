@@ -18,7 +18,7 @@ import FadeInView from "@/src/components/ui/FadeInView";
 import AnimatedPressable from "@/src/components/ui/AnimatedPressable";
 import { usePlaces } from "@/src/hooks/usePlaces";
 import { getCurrentLocation } from "@/src/services/location";
-import { router } from "expo-router";
+import { Redirect, router } from "expo-router";
 import { useBackgroundPermissionPrompt } from "@/src/hooks/useBackgroundPermissionPrompt";
 import BackgroundPermissionModal from "@/src/components/BackgroundPermissionModal";
 import { theme } from "@/src/theme";
@@ -26,8 +26,10 @@ import HomeHeader from "@/src/components/home/HomeHeader";
 import NearbyPlacesSection from "@/src/components/home/NearbyPlacesSection";
 import { useLocation } from "@/src/hooks/useLocation";
 import { useNearbyPlaces } from "@/src/hooks/useNearbyPlaces";
+import { useOnboardingStatus } from "@/src/hooks/useOnboardingStatus";
 
 export default function HomeScreen() {
+  const onboardingStatus = useOnboardingStatus();
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const insets = useSafeAreaInsets();
 
@@ -38,12 +40,20 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
 
   const {
+    needsPermission,
     visible: permissionPromptVisible,
-    placeName: permissionPromptPlaceName,
-    maybeShowPrompt,
+    show: showPermissionPrompt,
     handleAccept,
     handleDismiss,
   } = useBackgroundPermissionPrompt();
+
+  if (onboardingStatus === "loading") {
+    return null;
+  }
+
+  if (onboardingStatus === "pending") {
+    return <Redirect href="/onboarding" />;
+  }
 
   async function handleRefresh() {
     setRefreshing(true);
@@ -58,7 +68,6 @@ export default function HomeScreen() {
   async function handleCreatePlace(name: string, note: string, radius: number) {
     try {
       const currentLocation = await getCurrentLocation();
-      const wasFirstPlace = places.length === 0;
 
       await create({
         name,
@@ -69,7 +78,6 @@ export default function HomeScreen() {
       });
 
       setCreateModalVisible(false);
-      await maybeShowPrompt(wasFirstPlace, name);
     } catch {
       Alert.alert(
         "Kunne ikke gemme sted",
@@ -81,14 +89,12 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <HomeHeader
-        placeCount={places.length}
         nearbyPlacesCount={nearbyPlaces.length}
         nearestPlaceName={nearbyPlaces[0]?.place.name}
       />
 
       <BackgroundPermissionModal
         visible={permissionPromptVisible}
-        placeName={permissionPromptPlaceName}
         onAccept={handleAccept}
         onDismiss={handleDismiss}
       />
@@ -100,7 +106,24 @@ export default function HomeScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
       >
-        <NearbyPlacesSection />
+        {needsPermission ? (
+          <FadeInView style={styles.permissionNotice}>
+            <AnimatedPressable
+              style={styles.permissionCard}
+              onPress={showPermissionPrompt}
+            >
+              <Text style={styles.permissionTitle}>
+                Påmindelser er slået fra
+              </Text>
+              <Text style={styles.permissionText}>
+                Uden lokation i baggrunden kan vi kun minde dig om dine steder,
+                mens appen er åben. Tryk for at slå det til.
+              </Text>
+            </AnimatedPressable>
+          </FadeInView>
+        ) : null}
+
+        <NearbyPlacesSection nearbyPlaces={nearbyPlaces} />
 
         <Text style={styles.sectionTitle}>Mine steder</Text>
 
@@ -170,6 +193,32 @@ const styles = StyleSheet.create({
     paddingBottom: 140,
   },
 
+  permissionNotice: {
+    paddingHorizontal: theme.spacing.xl,
+    marginTop: theme.spacing.md,
+  },
+
+  permissionCard: {
+    backgroundColor: theme.colors.primaryMuted,
+    borderRadius: theme.radius.md,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
+    padding: theme.spacing.lg,
+  },
+
+  permissionTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: theme.colors.primary,
+  },
+
+  permissionText: {
+    marginTop: theme.spacing.xs,
+    fontSize: 14,
+    lineHeight: 20,
+    color: theme.colors.textSecondary,
+  },
+
   sectionTitle: {
     paddingHorizontal: theme.spacing.xl,
     marginTop: theme.spacing.lg,
@@ -207,7 +256,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.primary,
     paddingVertical: 15,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.button,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
     alignItems: "center",
     ...theme.shadow.card,
   },
@@ -221,10 +272,10 @@ const styles = StyleSheet.create({
   secondaryButton: {
     flex: 1,
     backgroundColor: theme.colors.surface,
-    borderWidth: 1,
+    borderWidth: theme.borderWidth,
     borderColor: theme.colors.border,
     paddingVertical: 15,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.button,
     alignItems: "center",
   },
 

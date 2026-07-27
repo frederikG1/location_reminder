@@ -9,7 +9,6 @@ import "dayjs/locale/da";
 
 dayjs.extend(relativeTime);
 dayjs.locale("da");
-dayjs.locale("en");
 
 type Props = {
   place: Place;
@@ -44,7 +43,12 @@ export function getPlaceEmoji(name: string) {
     return "🏋️";
   }
 
-  if (lower.includes("hjem") || lower.includes("home")) {
+  if (
+    lower.includes("hjem") ||
+    lower.includes("home") ||
+    lower.includes("mor") ||
+    lower.includes("far")
+  ) {
     return "🏠";
   }
 
@@ -91,6 +95,8 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: theme.colors.surface,
     borderRadius: theme.radius.md,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
     padding: theme.spacing.lg,
     ...theme.shadow.card,
     paddingHorizontal: theme.spacing.xl,
@@ -108,6 +114,8 @@ const styles = StyleSheet.create({
     height: 42,
     borderRadius: 21,
     backgroundColor: theme.colors.primaryMuted,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -138,11 +146,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-  },
-
-  meta: {
-    fontSize: 12,
-    color: theme.colors.textSecondary,
   },
 
   date: {

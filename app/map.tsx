@@ -144,6 +144,8 @@ const styles = StyleSheet.create({
     left: 16,
     backgroundColor: theme.colors.surface,
     borderRadius: theme.radius.md,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
     padding: theme.spacing.md,
     gap: 6,
     ...theme.shadow.floating,

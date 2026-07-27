@@ -16,7 +16,6 @@ export default function NearbyPlacesList({ places }: Props) {
 
   return (
     <FadeInView style={styles.container}>
-      
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -57,22 +56,14 @@ const styles = StyleSheet.create({
     right: 0,
     gap: theme.spacing.sm,
   },
-  heading: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: theme.colors.textSecondary,
-    letterSpacing: 0.4,
-    marginLeft: theme.spacing.lg,
-    textTransform: "uppercase",
-  },
   scrollContent: {
     paddingHorizontal: theme.spacing.lg,
     gap: 10,
   },
   card: {
     backgroundColor: theme.colors.surface,
-    borderLeftWidth: 3,
-    borderLeftColor: theme.colors.primary,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
     borderRadius: theme.radius.md,
     paddingVertical: 10,
     paddingHorizontal: 14,

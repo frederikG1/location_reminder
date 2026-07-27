@@ -3,6 +3,13 @@ import { usePlaces } from "@/src/hooks/usePlaces";
 import { calculateDistance } from "@/src/services/distance";
 import { useMemo } from "react";
 import { getProximityStatus } from "../services/proximity";
+import type { Place } from "@/src/models/Place";
+
+export type NearbyPlace = {
+  place: Place;
+  distance: number;
+  status: ReturnType<typeof getProximityStatus>;
+};
 
 export function useNearbyPlaces() {
   const { places } = usePlaces();
