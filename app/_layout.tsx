@@ -12,6 +12,7 @@ import {
 } from "@expo-google-fonts/nunito";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
@@ -46,48 +47,32 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ErrorBoundary>
         <LocationProvider>
+          {/*
+            Ingen skærme bruger den native header. Den er en hvid bjælke med
+            systemets chevron og systemskrift — tre ting appen ikke bruger
+            nogen andre steder. Hver skærm sætter i stedet sin egen
+            <ScreenHeader />, så tilbageknappen er den samme cirkel som
+            resten af appens ikonknapper.
+          */}
           <Stack
             screenOptions={{
-              headerStyle: { backgroundColor: theme.colors.surface },
-              headerTintColor: theme.colors.textPrimary,
-              headerTitleStyle: { fontFamily: theme.fonts.extrabold },
-              headerBackTitle: "Tilbage",
-              headerShadowVisible: false,
+              headerShown: false,
               contentStyle: { backgroundColor: theme.colors.background },
             }}
           >
             <Stack.Screen
-              name="index"
-              options={{
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
               name="onboarding"
               options={{
-                headerShown: false,
                 gestureEnabled: false,
               }}
             />
-            <Stack.Screen
-              name="places/[id]"
-              options={{
-                title: "Sted",
-              }}
-            />
-            <Stack.Screen
-              name="map"
-              options={{
-                title: "Kort",
-              }}
-            />
-            <Stack.Screen
-              name="settings"
-              options={{
-                title: "Indstillinger",
-              }}
-            />
           </Stack>
+
+          {/*
+            Sat her frem for per skærm: paletten er lys-only, og kortet ligger
+            nu helt op under statuslinjen, hvor lys tekst ville forsvinde.
+          */}
+          <StatusBar style="dark" />
         </LocationProvider>
       </ErrorBoundary>
     </GestureHandlerRootView>

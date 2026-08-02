@@ -1,9 +1,12 @@
-import OnboardingSheet from "@/src/components/onboarding/OnboardingSheet";
+import OnboardingSheet, {
+  SHEET_OVERHANG,
+} from "@/src/components/onboarding/OnboardingSheet";
 import PlaceFormFields, {
   RADIUS_DEFAULT,
 } from "@/src/components/places/PlaceFormFields";
 import { getPlaceEmoji } from "@/src/components/places/PlaceCard";
 import AnimatedPressable from "@/src/components/ui/AnimatedPressable";
+import { useKeyboardHeight } from "@/src/hooks/useKeyboardHeight";
 import { useLocation } from "@/src/hooks/useLocation";
 import { usePlaces } from "@/src/hooks/usePlaces";
 import { syncGeofences } from "@/src/services/geofencing";
@@ -22,12 +25,11 @@ import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from "react-native";
 import MapView, { Circle, Marker } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -45,6 +47,9 @@ type Step =
   | "armed";
 
 type Coords = { latitude: number; longitude: number };
+
+/** Grebets egen højde plus dets marginer — 5 - 6 + 16. */
+const HANDLE_ROW_HEIGHT = 15;
 
 export default function OnboardingScreen() {
   const [step, setStep] = useState<Step>("intro");
@@ -66,6 +71,31 @@ export default function OnboardingScreen() {
   const mapRef = useRef<MapView>(null);
   const hasCenteredRef = useRef(false);
   const insets = useSafeAreaInsets();
+  const keyboardHeight = useKeyboardHeight();
+  const { height: windowHeight } = useWindowDimensions();
+
+  // Konkrete pixeltal frem for procent. "88%" måler mod hele skærmen — også
+  // mens tastaturet dækker halvdelen — så arket blev ved med at være
+  // fuldskærmshøjt, mens det blev skubbet op: det er derfor overskriften endte
+  // oppe i statuslinjen. Her trækkes tastaturet fra først.
+  const formAvailableHeight = windowHeight - keyboardHeight;
+  const formSheetMaxHeight = Math.round(formAvailableHeight * 0.9);
+
+  // Uden tastatur skal bundpolstringen rydde home-indikatoren. Med tastatur
+  // ville præcis samme polstring bare være dødt rum oven på tasterne.
+  const formSheetPaddingBottom =
+    keyboardHeight > 0
+      ? theme.spacing.lg
+      : Math.max(insets.bottom, theme.spacing.xl) + 16;
+
+  // ScrollView'en skal have sin EGEN grænse, fratrukket alt det arket selv
+  // fylder — ellers kan de tilsammen blive højere end arket må være, og bunden
+  // bliver klippet væk i stedet for at kunne scrolles til.
+  const formScrollMaxHeight =
+    formSheetMaxHeight -
+    formSheetPaddingBottom -
+    HANDLE_ROW_HEIGHT -
+    theme.spacing.xxl;
 
   const showMap = step !== "intro";
   const ringCenter = pinnedCoords ?? location;
@@ -278,35 +308,47 @@ export default function OnboardingScreen() {
       ) : null}
 
       {step === "form" ? (
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          style={styles.formWrapper}
-          pointerEvents="box-none"
+        /*
+          Ingen KeyboardAvoidingView: arket er absolut placeret, og dens
+          padding-adfærd og `bottom: 0` trak i hver sin retning — den gjorde
+          arket højere frem for at give det mindre plads. Her lægges arket i
+          stedet direkte oven på tastaturet med `bottom`, og højderne er regnet
+          ud mod den plads der reelt er tilbage.
+        */
+        <OnboardingSheet
+          key="form"
+          handle
+          style={{
+            bottom: keyboardHeight,
+            // Overhænget lægges oven i grænsen, så den SYNLIGE højde stadig er
+            // formSheetMaxHeight.
+            maxHeight: formSheetMaxHeight + SHEET_OVERHANG,
+            paddingBottom: formSheetPaddingBottom + SHEET_OVERHANG,
+          }}
         >
-          <OnboardingSheet key="form" handle style={styles.formSheet}>
-            <ScrollView
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}
-            >
-              <Text style={styles.sectionTitle}>Hvad er her?</Text>
+          <ScrollView
+            style={{ maxHeight: formScrollMaxHeight }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            <Text style={styles.sectionTitle}>Hvad er her?</Text>
 
-              <View style={styles.formFields}>
-                <PlaceFormFields
-                  name={name}
-                  note={note}
-                  radius={radius}
-                  emoji={emoji}
-                  onChangeName={setName}
-                  onChangeNote={setNote}
-                  onChangeRadius={setRadius}
-                  onChangeEmoji={setEmoji}
-                  onSave={handleSave}
-                  showSuggestions
-                />
-              </View>
-            </ScrollView>
-          </OnboardingSheet>
-        </KeyboardAvoidingView>
+            <View style={styles.formFields}>
+              <PlaceFormFields
+                name={name}
+                note={note}
+                radius={radius}
+                emoji={emoji}
+                onChangeName={setName}
+                onChangeNote={setNote}
+                onChangeRadius={setRadius}
+                onChangeEmoji={setEmoji}
+                onSave={handleSave}
+                showSuggestions
+              />
+            </View>
+          </ScrollView>
+        </OnboardingSheet>
       ) : null}
 
       {step === "pinned" ? (
@@ -532,15 +574,6 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     marginTop: 10,
     maxWidth: 320,
-  },
-
-  formWrapper: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: "flex-end",
-  },
-
-  formSheet: {
-    maxHeight: "88%",
   },
 
   formFields: {

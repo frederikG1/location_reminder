@@ -1,4 +1,5 @@
 import NearbyPlacesList from "@/src/components/places/NearbyPlacesMapList";
+import BackButton from "@/src/components/ui/BackButton";
 import FadeInView from "@/src/components/ui/FadeInView";
 import { useLocation } from "@/src/hooks/useLocation";
 import { usePlaces } from "@/src/hooks/usePlaces";
@@ -9,11 +10,13 @@ import { router } from "expo-router";
 import { Fragment, useEffect, useMemo, useRef } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import MapView, { Circle, Marker } from "react-native-maps";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function MapScreen() {
   const { places } = usePlaces();
   const mapRef = useRef<MapView>(null);
   const hasCenteredRef = useRef(false);
+  const insets = useSafeAreaInsets();
 
   const { location } = useLocation();
 
@@ -103,6 +106,13 @@ export default function MapScreen() {
         ))}
       </MapView>
 
+      {/* Kortet får hele skærmen — en header ovenover ville koste et bånd af
+          netop det, skærmen findes for at vise. Knappen flyder derfor oven på
+          kortet, med samme kant og flade som forklaringsboksen nederst. */}
+      <BackButton
+        style={[styles.backButton, { top: insets.top + theme.spacing.sm }]}
+      />
+
       <NearbyPlacesList places={nearbyPlaces} />
 
       <FadeInView delay={200} style={styles.legend}>
@@ -132,6 +142,11 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1,
+  },
+  backButton: {
+    position: "absolute",
+    left: theme.spacing.lg,
+    ...theme.shadow.floating,
   },
   legend: {
     position: "absolute",

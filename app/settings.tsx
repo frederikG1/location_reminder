@@ -1,4 +1,5 @@
 import AnimatedPressable from "@/src/components/ui/AnimatedPressable";
+import ScreenHeader from "@/src/components/ui/ScreenHeader";
 import Toggle from "@/src/components/ui/Toggle";
 import { useNotificationPermission } from "@/src/hooks/useNotificationPermission";
 import { invalidateGeofenceSync, usePlaces } from "@/src/hooks/usePlaces";
@@ -16,6 +17,7 @@ import Constants from "expo-constants";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert, Linking, ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SettingsScreen() {
   const { places, refresh } = usePlaces();
@@ -91,101 +93,104 @@ export default function SettingsScreen() {
   }
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      showsVerticalScrollIndicator={false}
-    >
-      <Text style={styles.sectionTitle}>Påmindelser</Text>
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+      <ScreenHeader title="Indstillinger" />
 
-      <View style={styles.card}>
-        <View style={styles.row}>
-          <View style={styles.rowText}>
-            <Text style={styles.rowTitle}>Sæt påmindelser på pause</Text>
-            <Text style={styles.rowSubtitle}>
-              Dine steder bliver gemt, men du får ingen besked når du er i
-              nærheden.
-            </Text>
-          </View>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <Text style={styles.sectionTitle}>Påmindelser</Text>
 
-          <Toggle
-            value={paused ?? false}
-            onValueChange={handleTogglePause}
-            disabled={paused === null}
-            accessibilityLabel="Sæt påmindelser på pause"
-          />
-        </View>
-      </View>
+        <View style={styles.card}>
+          <View style={styles.row}>
+            <View style={styles.rowText}>
+              <Text style={styles.rowTitle}>Sæt påmindelser på pause</Text>
+              <Text style={styles.rowSubtitle}>
+                Dine steder bliver gemt, men du får ingen besked når du er i
+                nærheden.
+              </Text>
+            </View>
 
-      <Text style={styles.sectionTitle}>Tilladelser</Text>
-
-      <View style={styles.card}>
-        <View style={styles.row}>
-          <View style={styles.rowText}>
-            <Text style={styles.rowTitle}>Lokation i baggrunden</Text>
-            <Text style={styles.rowSubtitle}>
-              {hasBackground === null
-                ? "Tjekker …"
-                : hasBackground
-                  ? "Slået til"
-                  : "Slået fra — påmindelser virker kun mens appen er åben"}
-            </Text>
+            <Toggle
+              value={paused ?? false}
+              onValueChange={handleTogglePause}
+              disabled={paused === null}
+              accessibilityLabel="Sæt påmindelser på pause"
+            />
           </View>
         </View>
 
-        <View style={styles.divider} />
+        <Text style={styles.sectionTitle}>Tilladelser</Text>
 
-        <View style={styles.row}>
-          <View style={styles.rowText}>
-            <Text style={styles.rowTitle}>Notifikationer</Text>
-            <Text style={styles.rowSubtitle}>
-              {needsNotifications ? "Slået fra" : "Slået til"}
-            </Text>
+        <View style={styles.card}>
+          <View style={styles.row}>
+            <View style={styles.rowText}>
+              <Text style={styles.rowTitle}>Lokation i baggrunden</Text>
+              <Text style={styles.rowSubtitle}>
+                {hasBackground === null
+                  ? "Tjekker …"
+                  : hasBackground
+                    ? "Slået til"
+                    : "Slået fra — påmindelser virker kun mens appen er åben"}
+              </Text>
+            </View>
           </View>
+
+          <View style={styles.divider} />
+
+          <View style={styles.row}>
+            <View style={styles.rowText}>
+              <Text style={styles.rowTitle}>Notifikationer</Text>
+              <Text style={styles.rowSubtitle}>
+                {needsNotifications ? "Slået fra" : "Slået til"}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.divider} />
+
+          <AnimatedPressable
+            style={styles.action}
+            onPress={handleOpenSettings}
+            accessibilityRole="button"
+            accessibilityLabel="Åbn Indstillinger"
+          >
+            <Text style={styles.actionText}>Åbn Indstillinger</Text>
+          </AnimatedPressable>
         </View>
 
-        <View style={styles.divider} />
+        <Text style={styles.sectionTitle}>Data</Text>
 
-        <AnimatedPressable
-          style={styles.action}
-          onPress={handleOpenSettings}
-          accessibilityRole="button"
-          accessibilityLabel="Åbn Indstillinger"
-        >
-          <Text style={styles.actionText}>Åbn Indstillinger</Text>
-        </AnimatedPressable>
-      </View>
+        <View style={styles.card}>
+          <AnimatedPressable
+            style={styles.action}
+            onPress={handleReplayOnboarding}
+            accessibilityRole="button"
+            accessibilityLabel="Vis introduktionen igen"
+          >
+            <Text style={styles.actionText}>Vis introduktionen igen</Text>
+          </AnimatedPressable>
 
-      <Text style={styles.sectionTitle}>Data</Text>
+          <View style={styles.divider} />
 
-      <View style={styles.card}>
-        <AnimatedPressable
-          style={styles.action}
-          onPress={handleReplayOnboarding}
-          accessibilityRole="button"
-          accessibilityLabel="Vis introduktionen igen"
-        >
-          <Text style={styles.actionText}>Vis introduktionen igen</Text>
-        </AnimatedPressable>
+          <AnimatedPressable
+            style={styles.action}
+            onPress={handleDeleteEverything}
+            accessibilityRole="button"
+            accessibilityLabel="Slet alle data"
+          >
+            <Text style={[styles.actionText, styles.destructiveText]}>
+              Slet alle data
+            </Text>
+          </AnimatedPressable>
+        </View>
 
-        <View style={styles.divider} />
-
-        <AnimatedPressable
-          style={styles.action}
-          onPress={handleDeleteEverything}
-          accessibilityRole="button"
-          accessibilityLabel="Slet alle data"
-        >
-          <Text style={[styles.actionText, styles.destructiveText]}>
-            Slet alle data
-          </Text>
-        </AnimatedPressable>
-      </View>
-
-      <Text style={styles.version}>
-        Version {Constants.expoConfig?.version ?? "1.0.0"}
-      </Text>
-    </ScrollView>
+        <Text style={styles.version}>
+          Version {Constants.expoConfig?.version ?? "1.0.0"}
+        </Text>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -195,8 +200,11 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
 
+  // Ingen padding foroven — headeren sidder uden for ScrollView'en og har
+  // allerede sat afstanden, og den første sektionsoverskrift har sin egen
+  // marginTop.
   content: {
-    padding: theme.spacing.xl,
+    paddingHorizontal: theme.spacing.xl,
     paddingBottom: 60,
   },
 

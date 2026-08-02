@@ -54,7 +54,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#FF9500"
         }
-      ]
+      ],
+      "./plugins/withoutPushEntitlement"
     ],
     "experiments": {
       "typedRoutes": true,

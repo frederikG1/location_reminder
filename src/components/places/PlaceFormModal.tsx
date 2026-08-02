@@ -2,6 +2,7 @@ import PlaceFormFields, {
   RADIUS_DEFAULT,
 } from "@/src/components/places/PlaceFormFields";
 import AnimatedPressable from "@/src/components/ui/AnimatedPressable";
+import { useKeyboardHeight } from "@/src/hooks/useKeyboardHeight";
 import { theme } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
@@ -53,19 +54,29 @@ export default function CreatePlaceModal({
   const [emoji, setEmoji] = useState(initialEmoji ?? "");
   const insets = useSafeAreaInsets();
   const { height: windowHeight } = useWindowDimensions();
+  const keyboardHeight = useKeyboardHeight();
 
   // Et konkret pixeltal, ikke "92%" eller flex:1. Sheet'et er en
   // hug-content-boks (kun maxHeight, ingen egen height/flex) — en flex:1-
   // ScrollView deri kan ikke vide hvor meget plads den har, fordi boksens
   // egen højde afhænger af ScrollView'ens indhold, som igen venter på at
   // vide sin plads. Et fast tal bryder den cirkularitet.
-  const sheetMaxHeight = Math.round(windowHeight * 0.92);
+  //
+  // Tastaturet trækkes fra FØRST. Uden det var tallet stadig regnet ud fra
+  // hele skærmen, mens KeyboardAvoidingView skubbede arket op — så toppen
+  // (overskrift og emoji-vælger) endte oppe bag statuslinjen, netop når
+  // tastaturet var åbent.
+  const sheetMaxHeight = Math.round((windowHeight - keyboardHeight) * 0.92);
+
+  // Med tastatur oppe dækker det allerede home-indikatoren, så arkets egen
+  // bundpolstring ville bare være dødt rum oven på tasterne.
+  const sheetPaddingBottom = keyboardHeight > 0 ? theme.spacing.md : insets.bottom;
 
   // ScrollView'en skal have sin EGEN grænse, fratrukket arkets egen padding —
   // ellers kan de tilsammen blive højere end sheetMaxHeight, og bunden bliver
   // klippet væk af overflow:hidden i stedet for at kunne scrolles til.
   const scrollMaxHeight =
-    sheetMaxHeight - insets.bottom - theme.spacing.md - CLOSE_ROW_HEIGHT;
+    sheetMaxHeight - sheetPaddingBottom - theme.spacing.md - CLOSE_ROW_HEIGHT;
 
   useEffect(() => {
     setName(initialName ?? "");
@@ -112,7 +123,7 @@ export default function CreatePlaceModal({
               maxHeight: sheetMaxHeight + SHEET_OVERHANG,
               // Cremefarven fortsætter ned under home-indikatoren og videre ud
               // over skærmkanten, hvor bundkanten gemmer sig.
-              paddingBottom: insets.bottom + SHEET_OVERHANG,
+              paddingBottom: sheetPaddingBottom + SHEET_OVERHANG,
               marginBottom: -SHEET_OVERHANG,
             },
           ]}

@@ -2,6 +2,7 @@ import { getPlaceEmoji } from "@/src/components/places/PlaceCard";
 import CreatePlaceModal from "@/src/components/places/PlaceFormModal";
 import AnimatedPressable from "@/src/components/ui/AnimatedPressable";
 import FadeInView from "@/src/components/ui/FadeInView";
+import ScreenHeader from "@/src/components/ui/ScreenHeader";
 import { useVisits } from "@/src/hooks/useVisits";
 import { usePlaces } from "@/src/hooks/usePlaces";
 import { openDirections } from "@/src/services/directions";
@@ -30,7 +31,8 @@ export default function PlaceDetailScreen() {
 
   if (!place) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+        <ScreenHeader />
         <Text style={styles.notFound}>Sted ikke fundet</Text>
       </SafeAreaView>
     );
@@ -39,7 +41,14 @@ export default function PlaceDetailScreen() {
   const recentVisits = visits.slice(0, 5);
 
   return (
-    <SafeAreaView style={styles.container} edges={["left", "right", "bottom"]}>
+    <SafeAreaView
+      style={styles.container}
+      edges={["top", "left", "right", "bottom"]}
+    >
+      {/* Uden titel — stedets eget navn står stort lige nedenunder, og "Sted"
+          ovenover ville kun sige det samme med et fladere ord. */}
+      <ScreenHeader />
+
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
@@ -240,7 +249,9 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   scrollContent: {
-    padding: theme.spacing.xl,
+    paddingHorizontal: theme.spacing.xl,
+    // Mindre foroven end i siderne — headeren har allerede sat luft af.
+    paddingTop: theme.spacing.md,
   },
   header: {
     flexDirection: "row",
