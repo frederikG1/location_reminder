@@ -96,6 +96,8 @@ export default function PlaceFormFields({
           placeholder={getPlaceEmoji(name)}
           maxLength={16}
           style={styles.emojiInput}
+          accessibilityLabel="Symbol for stedet"
+          accessibilityHint="Skriv en emoji, ellers vælger vi en ud fra navnet"
         />
         <Text style={styles.emojiHint}>Tryk for at vælge dit eget symbol</Text>
       </View>
@@ -110,6 +112,9 @@ export default function PlaceFormFields({
                 key={suggestion.name}
                 style={[styles.chip, selected && styles.chipSelected]}
                 onPress={() => applySuggestion(suggestion)}
+                accessibilityRole="button"
+                accessibilityLabel={suggestion.name}
+                accessibilityState={{ selected }}
               >
                 <Text
                   style={[styles.chipText, selected && styles.chipTextSelected]}
@@ -140,7 +145,11 @@ export default function PlaceFormFields({
 
       <View style={styles.radiusRow}>
         <Text style={styles.radiusLabel}>Påmind mig indenfor</Text>
-        <Text style={styles.radiusWalk}>{formatWalkTime(radius)}</Text>
+
+        <View style={styles.radiusValueRow}>
+          <Text style={styles.radiusValue}>{formatRadiusLabel(radius)}</Text>
+          <Text style={styles.radiusWalk}>{formatWalkTime(radius)}</Text>
+        </View>
       </View>
 
       <View style={styles.radiusOptions}>
@@ -152,6 +161,9 @@ export default function PlaceFormFields({
               key={option}
               style={[styles.chip, selected && styles.chipSelected]}
               onPress={() => onChangeRadius(option)}
+              accessibilityRole="button"
+              accessibilityLabel={`Radius ${formatRadiusLabel(option)}`}
+              accessibilityState={{ selected }}
             >
               <Text
                 style={[styles.chipText, selected && styles.chipTextSelected]}
@@ -164,11 +176,21 @@ export default function PlaceFormFields({
       </View>
 
       {canSave ? (
-        <AnimatedPressable style={styles.saveButton} onPress={onSave}>
+        <AnimatedPressable
+          style={styles.saveButton}
+          onPress={onSave}
+          accessibilityRole="button"
+          accessibilityLabel={buttonLabel}
+        >
           <Text style={styles.saveButtonText}>{buttonLabel}</Text>
         </AnimatedPressable>
       ) : (
-        <View style={[styles.saveButton, styles.saveButtonDisabled]}>
+        <View
+          style={[styles.saveButton, styles.saveButtonDisabled]}
+          accessibilityRole="button"
+          accessibilityLabel={buttonLabel}
+          accessibilityState={{ disabled: true }}
+        >
           <Text style={styles.saveButtonText}>{buttonLabel}</Text>
         </View>
       )}
@@ -200,7 +222,7 @@ const styles = StyleSheet.create({
   emojiHint: {
     ...theme.typography.caption,
     flex: 1,
-    color: theme.colors.textMuted,
+    color: theme.colors.textSecondary,
   },
 
   chips: {
@@ -225,12 +247,13 @@ const styles = StyleSheet.create({
 
   chipText: {
     fontSize: 15,
-    fontWeight: "500",
+    fontFamily: theme.fonts.bold,
     color: theme.colors.textPrimary,
   },
 
   chipTextSelected: {
-    color: theme.colors.primary,
+    fontFamily: theme.fonts.extrabold,
+    color: theme.colors.primaryStrong,
   },
 
   input: {
@@ -241,6 +264,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 13,
     fontSize: 16,
+    fontFamily: theme.fonts.bold,
     color: theme.colors.textPrimary,
   },
 
@@ -260,9 +284,20 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
   },
 
+  radiusValueRow: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    gap: 7,
+  },
+
+  radiusValue: {
+    ...theme.typography.sectionTitle,
+    color: theme.colors.primaryStrong,
+  },
+
   radiusWalk: {
-    ...theme.typography.caption,
-    color: theme.colors.textMuted,
+    ...theme.typography.captionStrong,
+    color: theme.colors.textSecondary,
   },
 
   radiusOptions: {
@@ -290,8 +325,8 @@ const styles = StyleSheet.create({
   },
 
   saveButtonText: {
-    color: theme.colors.primaryText,
     fontSize: 17,
-    fontWeight: "600",
+    fontFamily: theme.fonts.black,
+    color: theme.colors.primaryText,
   },
 });

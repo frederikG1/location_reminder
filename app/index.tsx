@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   RefreshControl,
   ScrollView,
@@ -18,14 +19,17 @@ import FadeInView from "@/src/components/ui/FadeInView";
 import AnimatedPressable from "@/src/components/ui/AnimatedPressable";
 import { usePlaces } from "@/src/hooks/usePlaces";
 import { getCurrentLocation } from "@/src/services/location";
+import { MAX_MONITORED_REGIONS } from "@/src/services/geofencing";
 import { Redirect, router } from "expo-router";
 import { useBackgroundPermissionPrompt } from "@/src/hooks/useBackgroundPermissionPrompt";
 import BackgroundPermissionModal from "@/src/components/BackgroundPermissionModal";
 import { theme } from "@/src/theme";
 import HomeHeader from "@/src/components/home/HomeHeader";
 import NearbyPlacesSection from "@/src/components/home/NearbyPlacesSection";
+import PermissionNotice from "@/src/components/home/PermissionNotice";
 import { useLocation } from "@/src/hooks/useLocation";
 import { useNearbyPlaces } from "@/src/hooks/useNearbyPlaces";
+import { useNotificationPermission } from "@/src/hooks/useNotificationPermission";
 import { useOnboardingStatus } from "@/src/hooks/useOnboardingStatus";
 
 export default function HomeScreen() {
@@ -33,8 +37,8 @@ export default function HomeScreen() {
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const insets = useSafeAreaInsets();
 
-  const { places, create } = usePlaces();
-  const { refreshLocation } = useLocation();
+  const { places, create, refresh } = usePlaces();
+  const { refreshLocation, error: locationError } = useLocation();
   const nearbyPlaces = useNearbyPlaces();
 
   const [refreshing, setRefreshing] = useState(false);
@@ -47,8 +51,17 @@ export default function HomeScreen() {
     handleDismiss,
   } = useBackgroundPermissionPrompt();
 
+  const {
+    needsPermission: needsNotificationPermission,
+    openSettings: openNotificationSettings,
+  } = useNotificationPermission();
+
   if (onboardingStatus === "loading") {
-    return null;
+    return (
+      <SafeAreaView style={[styles.container, styles.centered]}>
+        <ActivityIndicator color={theme.colors.primary} />
+      </SafeAreaView>
+    );
   }
 
   if (onboardingStatus === "pending") {
@@ -59,7 +72,7 @@ export default function HomeScreen() {
     setRefreshing(true);
 
     try {
-      await refreshLocation();
+      await Promise.all([refreshLocation(), refresh()]);
     } finally {
       setRefreshing(false);
     }
@@ -97,6 +110,7 @@ export default function HomeScreen() {
       <HomeHeader
         nearbyPlacesCount={nearbyPlaces.length}
         nearestPlaceName={nearbyPlaces[0]?.place.name}
+        onOpenSettings={() => router.push("/settings")}
       />
 
       <BackgroundPermissionModal
@@ -113,19 +127,37 @@ export default function HomeScreen() {
         }
       >
         {needsPermission ? (
-          <FadeInView style={styles.permissionNotice}>
-            <AnimatedPressable
-              style={styles.permissionCard}
-              onPress={showPermissionPrompt}
-            >
-              <Text style={styles.permissionTitle}>
-                Påmindelser er slået fra
-              </Text>
-              <Text style={styles.permissionText}>
-                Uden lokation i baggrunden kan vi kun minde dig om dine steder,
-                mens appen er åben. Tryk for at slå det til.
-              </Text>
-            </AnimatedPressable>
+          <PermissionNotice
+            title="Påmindelser er slået fra"
+            message="Uden lokation i baggrunden kan vi kun minde dig om dine steder, mens appen er åben. Tryk for at slå det til."
+            onPress={showPermissionPrompt}
+          />
+        ) : null}
+
+        {needsNotificationPermission ? (
+          <PermissionNotice
+            title="Notifikationer er slået fra"
+            message="Vi registrerer dine besøg, men kan ikke sige til når du er i nærheden. Tryk for at åbne Indstillinger."
+            onPress={openNotificationSettings}
+            delay={40}
+          />
+        ) : null}
+
+        {locationError ? (
+          <FadeInView delay={80} style={styles.locationError}>
+            <Text style={styles.locationErrorText}>
+              Kan ikke finde din position lige nu. Træk ned for at prøve igen.
+            </Text>
+          </FadeInView>
+        ) : null}
+
+        {places.length > MAX_MONITORED_REGIONS ? (
+          <FadeInView delay={80} style={styles.locationError}>
+            <Text style={styles.locationErrorText}>
+              Du har {places.length} steder. iOS kan kun overvåge{" "}
+              {MAX_MONITORED_REGIONS} ad gangen, så vi holder øje med de{" "}
+              {MAX_MONITORED_REGIONS} nærmeste.
+            </Text>
           </FadeInView>
         ) : null}
 
@@ -168,6 +200,8 @@ export default function HomeScreen() {
         <AnimatedPressable
           style={styles.secondaryButton}
           onPress={() => router.push("/map")}
+          accessibilityRole="button"
+          accessibilityLabel="Åbn kort"
         >
           <Text style={styles.secondaryButtonText}>Åbn kort</Text>
         </AnimatedPressable>
@@ -175,6 +209,8 @@ export default function HomeScreen() {
         <AnimatedPressable
           style={styles.primaryButton}
           onPress={() => setCreateModalVisible(true)}
+          accessibilityRole="button"
+          accessibilityLabel="Gem nyt sted"
         >
           <Text style={styles.primaryButtonText}>+ Gem nyt sted</Text>
         </AnimatedPressable>
@@ -195,55 +231,46 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
 
+  // Centraliseret her i stedet for per sektion — PlaceCard i "Mine steder"
+  // rendere direkte som barn af ScrollView'en og har selv ingen ydre margin,
+  // så uden denne ville dens kant og runding gå helt ud til skærmkanten.
   scrollContent: {
     paddingBottom: 140,
+    paddingHorizontal: theme.spacing.xl,
   },
 
-  permissionNotice: {
-    paddingHorizontal: theme.spacing.xl,
+  centered: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  locationError: {
     marginTop: theme.spacing.md,
   },
 
-  permissionCard: {
-    backgroundColor: theme.colors.primaryMuted,
-    borderRadius: theme.radius.md,
-    borderWidth: theme.borderWidth,
-    borderColor: theme.colors.border,
-    padding: theme.spacing.lg,
-  },
-
-  permissionTitle: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: theme.colors.primary,
-  },
-
-  permissionText: {
-    marginTop: theme.spacing.xs,
+  locationErrorText: {
     fontSize: 14,
     lineHeight: 20,
+    fontFamily: theme.fonts.semibold,
     color: theme.colors.textSecondary,
   },
 
   sectionTitle: {
-    paddingHorizontal: theme.spacing.xl,
     marginTop: theme.spacing.lg,
     marginBottom: theme.spacing.md,
     fontSize: 18,
-    fontWeight: "700",
+    fontFamily: theme.fonts.black,
     color: theme.colors.textPrimary,
   },
 
   emptyState: {
     marginTop: 40,
-    paddingHorizontal: theme.spacing.xl,
   },
 
   emptyStateText: {
+    ...theme.typography.body,
     textAlign: "center",
-    fontSize: 15,
     color: theme.colors.textSecondary,
-    lineHeight: 22,
   },
 
   actions: {
@@ -270,9 +297,8 @@ const styles = StyleSheet.create({
   },
 
   primaryButtonText: {
+    ...theme.typography.button,
     color: theme.colors.primaryText,
-    fontSize: 16,
-    fontWeight: "600",
   },
 
   secondaryButton: {
@@ -286,8 +312,7 @@ const styles = StyleSheet.create({
   },
 
   secondaryButtonText: {
+    ...theme.typography.button,
     color: theme.colors.textPrimary,
-    fontSize: 16,
-    fontWeight: "600",
   },
 });

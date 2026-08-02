@@ -26,11 +26,22 @@ export default function BackgroundPermissionModal({
               næste gang du er i nærheden — også selvom appen ikke er åben.
             </Text>
 
-            <AnimatedPressable style={styles.primaryButton} onPress={onAccept}>
+            <AnimatedPressable
+              style={styles.primaryButton}
+              onPress={onAccept}
+              accessibilityRole="button"
+              accessibilityLabel="Ja, giv adgang"
+            >
               <Text style={styles.primaryButtonText}>Ja, giv adgang</Text>
             </AnimatedPressable>
 
-            <AnimatedPressable style={styles.dismissButton} onPress={onDismiss} haptic={false}>
+            <AnimatedPressable
+              style={styles.dismissButton}
+              onPress={onDismiss}
+              haptic={false}
+              accessibilityRole="button"
+              accessibilityLabel="Ikke nu"
+            >
               <Text style={styles.dismissButtonText}>Ikke nu</Text>
             </AnimatedPressable>
           </SafeAreaView>
@@ -59,14 +70,12 @@ const styles = StyleSheet.create({
     ...theme.shadow.floating,
   },
   heading: {
-    fontSize: 20,
-    fontWeight: "700",
+    ...theme.typography.sectionTitle,
     color: theme.colors.textPrimary,
     marginBottom: theme.spacing.md,
   },
   body: {
-    fontSize: 15,
-    lineHeight: 22,
+    ...theme.typography.body,
     color: theme.colors.textSecondary,
     marginBottom: theme.spacing.xxl,
   },
@@ -79,17 +88,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   primaryButtonText: {
+    ...theme.typography.button,
     color: theme.colors.primaryText,
-    fontSize: 16,
-    fontWeight: "600",
   },
   dismissButton: {
     paddingVertical: 14,
     alignItems: "center",
   },
   dismissButtonText: {
+    ...theme.typography.body,
     color: theme.colors.textSecondary,
-    fontSize: 15,
-    fontWeight: "500",
   },
 });

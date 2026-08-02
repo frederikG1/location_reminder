@@ -4,7 +4,6 @@ import { useLocation } from "@/src/hooks/useLocation";
 import { usePlaces } from "@/src/hooks/usePlaces";
 import { Place } from "@/src/models/Place";
 import { calculateDistance } from "@/src/services/distance";
-import { requestNotificationPermissions } from "@/src/services/notifications";
 import { theme } from "@/src/theme";
 import { router } from "expo-router";
 import { Fragment, useEffect, useMemo, useRef } from "react";
@@ -17,10 +16,6 @@ export default function MapScreen() {
   const hasCenteredRef = useRef(false);
 
   const { location } = useLocation();
-
-  useEffect(() => {
-    requestNotificationPermissions();
-  }, []);
 
   useEffect(() => {
     if (!location || hasCenteredRef.current) {

@@ -1,16 +1,17 @@
 {
   "expo": {
-    "name": "location_reminder",
+    "name": "Pin Me",
     "slug": "location_reminder",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "locationreminder",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.frederik.locationreminder",
+      "buildNumber": "1",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Vi bruger din lokation til at gemme og finde dine steder.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "Tillad lokation i baggrunden, så vi kan minde dig om dine gemte steder, selv når appen ikke er åben.",
@@ -44,12 +45,9 @@
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
+          "imageWidth": 160,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
-          "dark": {
-            "backgroundColor": "#000000"
-          }
+          "backgroundColor": "#FF9500"
         }
       ]
     ],

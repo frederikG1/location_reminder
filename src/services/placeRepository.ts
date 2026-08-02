@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { log } from "../util/logger";
 import { Place } from "../models/Place";
 
 const STORAGE_KEY = "places";
@@ -12,14 +13,23 @@ export async function savePlace(place: Place) {
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
 }
 
+// En beskadiget eller halvskrevet blob må ikke kunne vælte appen. Vi falder
+// tilbage til en tom liste frem for at lade en SyntaxError boble op i UI'et.
 export async function getPlaces(): Promise<Place[]> {
-  const data = await AsyncStorage.getItem(STORAGE_KEY);
+  try {
+    const data = await AsyncStorage.getItem(STORAGE_KEY);
 
-  if (!data) {
+    if (!data) {
+      return [];
+    }
+
+    const parsed = JSON.parse(data);
+
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    log("Kunne ikke læse steder:", error);
     return [];
   }
-
-  return JSON.parse(data);
 }
 
 export async function updatePlace(updatedPlace: Place) {
@@ -30,6 +40,10 @@ export async function updatePlace(updatedPlace: Place) {
   );
 
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPlaces));
+}
+
+export async function clearAllPlaces() {
+  await AsyncStorage.removeItem(STORAGE_KEY);
 }
 
 export async function deletePlace(id: string) {

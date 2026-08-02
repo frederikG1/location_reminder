@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 
 import { theme } from "@/src/theme";
+import { formatDistance } from "@/src/util/formatDistance";
 import type { NearbyPlace } from "@/src/hooks/useNearbyPlaces";
 import FadeInView from "../ui/FadeInView";
 import { router } from "expo-router";
@@ -24,7 +25,7 @@ export default function NearbyPlacesSection({ nearbyPlaces }: Props) {
           </Text>
         </View>
       ) : (
-        nearbyPlaces.map(({ place, status }, index) => (
+        nearbyPlaces.map(({ place, status, distance }, index) => (
           <FadeInView key={place.id} delay={index * 70}>
             <AnimatedPressable
               style={styles.card}
@@ -36,19 +37,18 @@ export default function NearbyPlacesSection({ nearbyPlaces }: Props) {
                   },
                 })
               }
+              accessibilityRole="button"
+              accessibilityLabel={`${place.name}, ${formatDistance(distance)} væk, ${status.label}${place.note ? `. ${place.note}` : ""}`}
             >
               <View style={styles.topRow}>
                 <Text style={styles.placeName}>{place.name}</Text>
 
-                <View
-                  style={[
-                    styles.statusBadge,
-                    {
-                      backgroundColor: status.color,
-                    },
-                  ]}
-                >
-                  <Text style={styles.statusText}>{status.label}</Text>
+                {/* Afstanden er mere brugbar end nærhedsgraden på skærmen;
+                    selve statusordet lever videre i accessibilityLabel. */}
+                <View style={styles.distanceBadge}>
+                  <Text style={styles.distanceText}>
+                    {formatDistance(distance)}
+                  </Text>
                 </View>
               </View>
               {place.note && <Text style={styles.note}>{place.note}</Text>}
@@ -61,14 +61,15 @@ export default function NearbyPlacesSection({ nearbyPlaces }: Props) {
 }
 
 const styles = StyleSheet.create({
+  // Ingen paddingHorizontal her — den horisontale indrykning kommer nu fra
+  // app/index.tsx's scrollContent, så "I nærheden" og "Mine steder" flugter.
   container: {
-    paddingHorizontal: theme.spacing.xl,
     marginTop: theme.spacing.md,
   },
 
   title: {
     fontSize: 18,
-    fontWeight: "700",
+    fontFamily: theme.fonts.black,
     color: theme.colors.textPrimary,
     marginBottom: theme.spacing.md,
   },
@@ -93,13 +94,14 @@ const styles = StyleSheet.create({
   placeName: {
     flex: 1,
     fontSize: 16,
-    fontWeight: "600",
+    fontFamily: theme.fonts.extrabold,
     color: theme.colors.textPrimary,
   },
   note: {
     marginTop: theme.spacing.sm,
     color: theme.colors.textSecondary,
     fontSize: 14,
+    fontFamily: theme.fonts.semibold,
   },
 
   emptyCard: {
@@ -112,7 +114,7 @@ const styles = StyleSheet.create({
 
   emptyTitle: {
     fontSize: 16,
-    fontWeight: "600",
+    fontFamily: theme.fonts.extrabold,
     color: theme.colors.textPrimary,
     textAlign: "center",
   },
@@ -120,19 +122,21 @@ const styles = StyleSheet.create({
   emptyText: {
     marginTop: theme.spacing.xs,
     fontSize: 14,
+    fontFamily: theme.fonts.semibold,
     color: theme.colors.textSecondary,
     textAlign: "center",
   },
-  statusBadge: {
-    alignSelf: "flex-start",
-    marginTop: theme.spacing.sm,
+  distanceBadge: {
+    backgroundColor: theme.colors.primary,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.pill,
     paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 999,
+    paddingVertical: 4,
   },
-  statusText: {
-    color: "#fff",
+  distanceText: {
     fontSize: 13,
-    fontWeight: "700",
+    fontFamily: theme.fonts.black,
+    color: theme.colors.textPrimary,
   },
 });

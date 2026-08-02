@@ -1,6 +1,7 @@
 import { Place } from "@/src/models/Place";
-import { syncGeofences } from "@/src/services/geofencing";
+import { stopAllGeofencing, syncGeofences } from "@/src/services/geofencing";
 import { hasBackgroundLocationPermission } from "@/src/services/location";
+import { areRemindersPaused } from "@/src/services/reminderSettings";
 import * as placeRepository from "@/src/services/placeRepository";
 import * as visitRepository from "@/src/services/visitRepository";
 import { useFocusEffect } from "@react-navigation/native";
@@ -8,6 +9,15 @@ import * as Crypto from "expo-crypto";
 import { useCallback, useEffect, useState } from "react";
 
 let geofencesSynced = false;
+
+/**
+ * Tvinger næste montering til at armere geofences igen. Bruges når noget uden
+ * for hooken ændrer forudsætningerne — f.eks. når påmindelser sættes på pause
+ * eller slippes løs igen fra indstillingerne.
+ */
+export function invalidateGeofenceSync() {
+  geofencesSynced = false;
+}
 
 export function usePlaces() {
   const [places, setPlaces] = useState<Place[]>([]);
@@ -77,10 +87,19 @@ export function usePlaces() {
 
     (async () => {
       const hasPermission = await hasBackgroundLocationPermission();
-      if (hasPermission) {
-        await syncGeofences(places);
-        geofencesSynced = true;
+      if (!hasPermission) {
+        return;
       }
+
+      // Pausen sættes i indstillingerne og skal overleve genstart, så den
+      // tjekkes her frem for kun der hvor kontakten sidder.
+      if (await areRemindersPaused()) {
+        await stopAllGeofencing();
+      } else {
+        await syncGeofences(places);
+      }
+
+      geofencesSynced = true;
     })();
   }, [places, hasLoaded]);
 

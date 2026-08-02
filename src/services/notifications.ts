@@ -1,3 +1,4 @@
+import { log } from "@/src/util/logger";
 import * as Notifications from "expo-notifications";
 
 Notifications.setNotificationHandler({
@@ -12,29 +13,30 @@ Notifications.setNotificationHandler({
 export async function requestNotificationPermissions() {
   const { status } = await Notifications.requestPermissionsAsync();
 
-  if (status !== "granted") {
-    console.log("Permission denied");
-    return false;
-  }
+  return status === "granted";
+}
 
-  return true;
+export async function hasNotificationPermission() {
+  const { status } = await Notifications.getPermissionsAsync();
+
+  return status === "granted";
 }
 
 export async function sendNotification(
   title: string,
-  body: string
+  body: string,
+  data?: Record<string, unknown>,
 ) {
   try {
     await Notifications.scheduleNotificationAsync({
       content: {
         title,
         body,
+        data,
       },
       trigger: null,
     });
-
-    console.log("Notification sent");
   } catch (error) {
-    console.log("Notification error:", error);
+    log("Notification error:", error);
   }
 }

@@ -4,6 +4,10 @@ export const theme = {
     surface: "#FFFFFF",
     surfaceAlt: "#FFF4DE",
     primary: "#FF9500",
+    // Orange som TEKST eller IKON — aldrig `primary`, der kun giver 2.0:1 mod
+    // cremebaggrunden. Denne er 4.5:1 mod creme og 4.9:1 mod hvid.
+    // `primary` er stadig den rigtige til fyld, kanter, prikker og knapflader.
+    primaryStrong: "#B05A00",
     primaryMuted: "#FFF4DE",
     primaryText: "#1A1200", // orange buttons use dark text, not white
     primaryDisabled: "#FFD9A0",
@@ -13,9 +17,12 @@ export const theme = {
     primaryFill: "rgba(255, 149, 0, 0.2)",
     ringFill: "rgba(255, 149, 0, 0.2)",
     locationDot: "#0A84FF",
+    mapSurface: "#F3E7CE", // bag kortet indtil fliserne er hentet
     textPrimary: "#1A1200",
     textSecondary: "#8A6A2A",
-    textMuted: "#B99457",
+    // Var #B99457, som kun gav 2.6:1 mod baggrunden — under WCAG AA's 4.5:1 for
+    // små tekster. Hierarkiet bæres nu af skriftstørrelse og vægt, ikke farve.
+    textMuted: "#8A6A2A",
     border: "#1A1200", // thick outline, not a hairline
     inputBg: "#FFF4DE",
     overlay: "rgba(26, 18, 0, 0.45)",
@@ -38,48 +45,66 @@ export const theme = {
     xl: 20,
     xxl: 24,
   },
+  // React Native kan ikke vælge vægt inden for en custom fontfamilie — hver
+  // vægt ER sin egen familie. Derfor sætter tokens herunder `fontFamily` og
+  // ikke `fontWeight`: kombinerer man begge, syntetiserer iOS oven i den
+  // allerede fede skrift. Rendering er gated på at fonten er loadet
+  // (app/_layout.tsx), så der er aldrig et vindue uden den.
+  fonts: {
+    semibold: "Nunito_600SemiBold",
+    bold: "Nunito_700Bold",
+    extrabold: "Nunito_800ExtraBold",
+    black: "Nunito_900Black",
+  },
   typography: {
-    // fontFamily: a heavy geometric sans (e.g. "Nunito"/"Baloo 2" at 800/900) reads best here
     title: {
       fontSize: 29,
-      fontWeight: "900",
+      fontFamily: "Nunito_900Black",
       letterSpacing: -0.6,
-      lineHeight: 33,
+      lineHeight: 36,
     },
     titleSm: {
       fontSize: 27,
-      fontWeight: "900",
+      fontFamily: "Nunito_900Black",
       letterSpacing: -0.5,
-      lineHeight: 31,
+      lineHeight: 34,
     },
     heading: {
       fontSize: 23,
-      fontWeight: "900",
+      fontFamily: "Nunito_900Black",
       letterSpacing: -0.4,
     },
     sectionTitle: {
       fontSize: 20,
-      fontWeight: "800",
+      fontFamily: "Nunito_900Black",
       letterSpacing: -0.3,
     },
     body: {
       fontSize: 15,
       lineHeight: 22,
-      fontWeight: "600",
+      fontFamily: "Nunito_600SemiBold",
     },
     label: {
       fontSize: 14,
-      fontWeight: "800",
+      fontFamily: "Nunito_800ExtraBold",
     },
     caption: {
       fontSize: 13,
-      fontWeight: "600",
+      fontFamily: "Nunito_600SemiBold",
+    },
+    captionStrong: {
+      fontSize: 13,
+      fontFamily: "Nunito_700Bold",
     },
     kicker: {
       fontSize: 12,
-      fontWeight: "800",
-      letterSpacing: 0.4,
+      fontFamily: "Nunito_900Black",
+      letterSpacing: 0.6,
       textTransform: "uppercase",
+    },
+    button: {
+      fontSize: 16,
+      fontFamily: "Nunito_800ExtraBold",
     },
   },
   shadow: {

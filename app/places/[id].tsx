@@ -93,7 +93,7 @@ export default function PlaceDetailScreen() {
           </MapView>
         </FadeInView>
 
-        <FadeInView delay={100}>
+        <FadeInView delay={100} style={styles.mapActions}>
           <AnimatedPressable
             style={styles.routeButton}
             onPress={() =>
@@ -102,11 +102,13 @@ export default function PlaceDetailScreen() {
                 longitude: place.longitude,
               })
             }
+            accessibilityRole="button"
+            accessibilityLabel={`Vis rute til ${place.name}`}
           >
             <Ionicons
               name="navigate-outline"
-              size={18}
-              color={theme.colors.primary}
+              size={17}
+              color={theme.colors.primaryStrong}
             />
             <Text style={styles.routeButtonText}>Vis rute</Text>
           </AnimatedPressable>
@@ -151,6 +153,8 @@ export default function PlaceDetailScreen() {
         <AnimatedPressable
           style={styles.secondaryButton}
           onPress={() => setEditModalVisible(true)}
+          accessibilityRole="button"
+          accessibilityLabel={`Rediger ${place.name}`}
         >
           <Text style={styles.secondaryButtonText}>Rediger</Text>
         </AnimatedPressable>
@@ -158,6 +162,8 @@ export default function PlaceDetailScreen() {
         <AnimatedPressable
           style={styles.destructiveButton}
           onPress={() => handleDelete(place.id)}
+          accessibilityRole="button"
+          accessibilityLabel={`Slet ${place.name}`}
         >
           <Text style={styles.destructiveButtonText}>Slet sted</Text>
         </AnimatedPressable>
@@ -268,7 +274,7 @@ const styles = StyleSheet.create({
   },
   notFound: {
     padding: theme.spacing.xl,
-    fontSize: 16,
+    ...theme.typography.body,
     color: theme.colors.textSecondary,
   },
   mapCard: {
@@ -283,22 +289,26 @@ const styles = StyleSheet.create({
   map: {
     flex: 1,
   },
-  routeButton: {
+  mapActions: {
+    flexDirection: "row",
+    gap: theme.spacing.md,
     marginTop: theme.spacing.lg,
+  },
+  routeButton: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: theme.spacing.sm,
-    backgroundColor: theme.colors.primaryMuted,
+    backgroundColor: theme.colors.background,
     borderRadius: theme.radius.button,
     borderWidth: theme.borderWidth,
     borderColor: theme.colors.border,
     paddingVertical: 13,
   },
   routeButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: theme.colors.primary,
+    ...theme.typography.button,
+    color: theme.colors.primaryStrong,
   },
   statsRow: {
     flexDirection: "row",
@@ -351,13 +361,14 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.sm,
   },
   historyDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 9,
+    height: 9,
+    borderRadius: 5,
     backgroundColor: theme.colors.primary,
   },
   historyText: {
-    ...theme.typography.body,
+    fontSize: 15,
+    fontFamily: theme.fonts.bold,
     color: theme.colors.textPrimary,
   },
   actions: {
@@ -381,9 +392,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   secondaryButtonText: {
+    ...theme.typography.button,
     color: theme.colors.textPrimary,
-    fontSize: 16,
-    fontWeight: "600",
   },
   destructiveButton: {
     flex: 1,
@@ -395,8 +405,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   destructiveButtonText: {
+    ...theme.typography.button,
     color: theme.colors.surface,
-    fontSize: 16,
-    fontWeight: "600",
   },
 });

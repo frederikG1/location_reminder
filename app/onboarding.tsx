@@ -20,6 +20,7 @@ import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -332,6 +333,8 @@ export default function OnboardingScreen() {
           <AnimatedPressable
             style={styles.skipButton}
             onPress={handleSkipReminders}
+            accessibilityRole="button"
+            accessibilityLabel="Kun når appen er åben"
           >
             <Text style={styles.skipButtonText}>Kun når appen er åben</Text>
           </AnimatedPressable>
@@ -380,12 +383,24 @@ function PrimaryButton({
       style={[styles.primaryButton, dark && styles.primaryButtonDark]}
       onPress={onPress}
       disabled={busy}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ disabled: busy, busy }}
     >
-      <Text
-        style={[styles.primaryButtonText, dark && styles.primaryButtonTextDark]}
-      >
-        {label}
-      </Text>
+      {busy ? (
+        <ActivityIndicator
+          color={dark ? theme.colors.surface : theme.colors.primaryText}
+        />
+      ) : (
+        <Text
+          style={[
+            styles.primaryButtonText,
+            dark && styles.primaryButtonTextDark,
+          ]}
+        >
+          {label}
+        </Text>
+      )}
     </AnimatedPressable>
   );
 }
@@ -454,8 +469,7 @@ const styles = StyleSheet.create({
   },
 
   locationLabel: {
-    ...theme.typography.caption,
-    fontWeight: "600",
+    ...theme.typography.captionStrong,
     color: theme.colors.textPrimary,
   },
 
@@ -572,9 +586,9 @@ const styles = StyleSheet.create({
   },
 
   primaryButtonText: {
-    color: theme.colors.primaryText,
     fontSize: 17,
-    fontWeight: "600",
+    fontFamily: theme.fonts.black,
+    color: theme.colors.primaryText,
   },
 
   // The dark variant swaps the fill to ink — primaryText is ink too now, so
@@ -590,7 +604,6 @@ const styles = StyleSheet.create({
 
   skipButtonText: {
     ...theme.typography.body,
-    fontWeight: "500",
-    color: theme.colors.textMuted,
+    color: theme.colors.textSecondary,
   },
 });

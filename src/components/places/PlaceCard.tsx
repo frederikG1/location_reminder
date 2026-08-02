@@ -57,7 +57,12 @@ export function getPlaceEmoji(name: string) {
 
 export default function PlaceCard({ place, onPress }: Props) {
   return (
-    <AnimatedPressable style={styles.card} onPress={onPress}>
+    <AnimatedPressable
+      style={styles.card}
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={place.note ? `${place.name}. ${place.note}` : place.name}
+    >
       <View style={styles.mainRow}>
         <View style={styles.iconContainer}>
           <Text style={styles.icon}>
@@ -79,8 +84,8 @@ export default function PlaceCard({ place, onPress }: Props) {
 
         <Ionicons
           name="chevron-forward"
-          size={20}
-          color={theme.colors.textMuted}
+          size={18}
+          color={theme.colors.textSecondary}
         />
       </View>
 
@@ -132,14 +137,15 @@ const styles = StyleSheet.create({
 
   title: {
     fontSize: 17,
-    fontWeight: "600",
+    fontFamily: theme.fonts.extrabold,
     color: theme.colors.textPrimary,
   },
 
   note: {
-    marginTop: 4,
+    marginTop: 2,
     fontSize: 14,
     lineHeight: 19,
+    fontFamily: theme.fonts.semibold,
     color: theme.colors.textSecondary,
   },
 
@@ -152,6 +158,7 @@ const styles = StyleSheet.create({
 
   date: {
     fontSize: 12,
-    color: theme.colors.textMuted,
+    fontFamily: theme.fonts.bold,
+    color: theme.colors.textSecondary,
   },
 });

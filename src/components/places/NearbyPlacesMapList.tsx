@@ -31,6 +31,10 @@ export default function NearbyPlacesList({ places }: Props) {
                   params: { id: place.id },
                 })
               }
+              accessibilityRole="button"
+              accessibilityLabel={
+                place.note ? `${place.name}. ${place.note}` : place.name
+              }
             >
               <Text style={styles.name} numberOfLines={1}>
                 {place.name}
@@ -73,12 +77,13 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 15,
-    fontWeight: "600",
+    fontFamily: theme.fonts.extrabold,
     color: theme.colors.textPrimary,
   },
   note: {
     marginTop: 2,
     fontSize: 12,
+    fontFamily: theme.fonts.semibold,
     color: theme.colors.textSecondary,
   },
 });
