@@ -65,13 +65,19 @@ export default function HomeScreen() {
     }
   }
 
-  async function handleCreatePlace(name: string, note: string, radius: number) {
+  async function handleCreatePlace(
+    name: string,
+    note: string,
+    radius: number,
+    emoji: string,
+  ) {
     try {
       const currentLocation = await getCurrentLocation();
 
       await create({
         name,
         note,
+        emoji: emoji || undefined,
         latitude: currentLocation.latitude,
         longitude: currentLocation.longitude,
         radius,

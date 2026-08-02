@@ -60,7 +60,9 @@ export default function PlaceCard({ place, onPress }: Props) {
     <AnimatedPressable style={styles.card} onPress={onPress}>
       <View style={styles.mainRow}>
         <View style={styles.iconContainer}>
-          <Text style={styles.icon}>{getPlaceEmoji(place.name)}</Text>
+          <Text style={styles.icon}>
+            {place.emoji || getPlaceEmoji(place.name)}
+          </Text>
         </View>
 
         <View style={styles.content}>

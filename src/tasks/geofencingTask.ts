@@ -3,6 +3,7 @@ import * as Location from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Place } from "@/src/models/Place";
 import { sendNotification } from "@/src/services/notifications";
+import { addVisit } from "@/src/services/visitRepository";
 
 export const GEOFENCING_TASK_NAME = "location-reminder-geofencing";
 
@@ -39,6 +40,13 @@ TaskManager.defineTask(GEOFENCING_TASK_NAME, async ({ data, error }) => {
   if (!place) {
     return;
   }
+
+  await addVisit({
+    id: `${Date.now()}-${place.id}`,
+    placeId: place.id,
+    placeName: place.name,
+    timestamp: new Date().toISOString(),
+  });
 
   await sendNotification(
     "Du er i nærheden!",

@@ -2,37 +2,27 @@ import { Place } from "@/src/models/Place";
 import { syncGeofences } from "@/src/services/geofencing";
 import { hasBackgroundLocationPermission } from "@/src/services/location";
 import * as placeRepository from "@/src/services/placeRepository";
+import * as visitRepository from "@/src/services/visitRepository";
+import { useFocusEffect } from "@react-navigation/native";
 import * as Crypto from "expo-crypto";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 let geofencesSynced = false;
 
 export function usePlaces() {
   const [places, setPlaces] = useState<Place[]>([]);
   const [hasLoaded, setHasLoaded] = useState(false);
-  const prevPlacesRef = useRef<Place[]>([]);
 
   const refresh = useCallback(async () => {
     const loadedPlaces = await placeRepository.getPlaces();
-
-    // Only update state if places actually changed
-    const placesChanged =
-      loadedPlaces.length !== prevPlacesRef.current.length ||
-      loadedPlaces.some(
-        (place, index) => place.id !== prevPlacesRef.current[index]?.id,
-      );
-
-    if (placesChanged) {
-      setPlaces(loadedPlaces);
-    }
-
-    prevPlacesRef.current = loadedPlaces;
+    setPlaces(loadedPlaces);
     setHasLoaded(true);
   }, []);
 
   type CreatePlaceInput = {
     name: string;
     note?: string;
+    emoji?: string;
     latitude: number;
     longitude: number;
     radius: number;
@@ -43,6 +33,7 @@ export function usePlaces() {
       id: Crypto.randomUUID(),
       name: input.name,
       note: input.note,
+      emoji: input.emoji,
       latitude: input.latitude,
       longitude: input.longitude,
       radius: input.radius,
@@ -56,6 +47,7 @@ export function usePlaces() {
 
   const remove = async (id: string) => {
     await placeRepository.deletePlace(id);
+    await visitRepository.deleteVisitsForPlace(id);
     geofencesSynced = false;
     await refresh();
   };
@@ -66,9 +58,14 @@ export function usePlaces() {
     await refresh();
   };
 
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
+  // Refetch whenever this screen (re)gains focus, not just on mount — a
+  // screen further down the stack doesn't remount when you navigate back to
+  // it, so without this it would keep showing data from before the edit.
+  useFocusEffect(
+    useCallback(() => {
+      refresh();
+    }, [refresh]),
+  );
 
   // Only sync geofences once on startup, then after manual changes.
   // Waits for the first load — syncing the empty initial state would latch the

@@ -1,13 +1,34 @@
+import { getPlaceEmoji } from "@/src/components/places/PlaceCard";
 import AnimatedPressable from "@/src/components/ui/AnimatedPressable";
 import { theme } from "@/src/theme";
 import { formatWalkTime } from "@/src/util/formatWalkTime";
-import Slider from "@react-native-community/slider";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 
-export const RADIUS_MIN = 50;
-export const RADIUS_MAX = 1000;
-export const RADIUS_STEP = 25;
-export const RADIUS_DEFAULT = 200;
+export const RADIUS_OPTIONS = [50, 100, 250, 500, 1000];
+export const RADIUS_DEFAULT = 250;
+
+function formatRadiusLabel(radius: number) {
+  return radius >= 1000 ? `${radius / 1000} km` : `${radius} m`;
+}
+
+/**
+ * Typing a new emoji appends to whatever's already there, so this keeps only
+ * the most recently typed one. Segmented by grapheme cluster, not code unit,
+ * so multi-part emoji (skin tones, flags, ZWJ sequences) survive intact.
+ */
+function keepLastEmoji(text: string): string {
+  if (typeof Intl !== "undefined" && "Segmenter" in Intl) {
+    const segments = Array.from(
+      new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(
+        text,
+      ),
+    );
+    return segments.length > 0 ? segments[segments.length - 1].segment : "";
+  }
+
+  const codePoints = Array.from(text);
+  return codePoints.length > 0 ? codePoints[codePoints.length - 1] : "";
+}
 
 type Suggestion = {
   emoji: string;
@@ -26,9 +47,11 @@ type Props = {
   name: string;
   note: string;
   radius: number;
+  emoji: string;
   onChangeName: (name: string) => void;
   onChangeNote: (note: string) => void;
   onChangeRadius: (radius: number) => void;
+  onChangeEmoji: (emoji: string) => void;
   onSave: () => void;
   showSuggestions?: boolean;
   saveLabel?: string;
@@ -36,16 +59,18 @@ type Props = {
 
 /**
  * The body of the save-a-place form: suggestion chips, name, note and the
- * radius slider. Shared by the first-run flow and the save/edit modal so the
+ * radius presets. Shared by the first-run flow and the save/edit modal so the
  * sheet you meet on day one is the same one you use on day thirty.
  */
 export default function PlaceFormFields({
   name,
   note,
   radius,
+  emoji,
   onChangeName,
   onChangeNote,
   onChangeRadius,
+  onChangeEmoji,
   onSave,
   showSuggestions = false,
   saveLabel,
@@ -59,10 +84,22 @@ export default function PlaceFormFields({
   function applySuggestion(suggestion: Suggestion) {
     onChangeName(suggestion.name);
     onChangeNote(suggestion.note);
+    onChangeEmoji(suggestion.emoji);
   }
 
   return (
     <View>
+      <View style={styles.emojiRow}>
+        <TextInput
+          value={emoji}
+          onChangeText={(text) => onChangeEmoji(keepLastEmoji(text))}
+          placeholder={getPlaceEmoji(name)}
+          maxLength={16}
+          style={styles.emojiInput}
+        />
+        <Text style={styles.emojiHint}>Tryk for at vælge dit eget symbol</Text>
+      </View>
+
       {showSuggestions ? (
         <View style={styles.chips}>
           {SUGGESTIONS.map((suggestion) => {
@@ -103,27 +140,27 @@ export default function PlaceFormFields({
 
       <View style={styles.radiusRow}>
         <Text style={styles.radiusLabel}>Påmind mig indenfor</Text>
-
-        <View style={styles.radiusValueRow}>
-          <Text style={styles.radiusValue}>{radius} m</Text>
-          <Text style={styles.radiusWalk}>{formatWalkTime(radius)}</Text>
-        </View>
+        <Text style={styles.radiusWalk}>{formatWalkTime(radius)}</Text>
       </View>
 
-      <Slider
-        minimumValue={RADIUS_MIN}
-        maximumValue={RADIUS_MAX}
-        step={RADIUS_STEP}
-        value={radius}
-        onValueChange={onChangeRadius}
-        minimumTrackTintColor={theme.colors.primary}
-        maximumTrackTintColor={theme.colors.border}
-        thumbTintColor={theme.colors.primary}
-      />
+      <View style={styles.radiusOptions}>
+        {RADIUS_OPTIONS.map((option) => {
+          const selected = radius === option;
 
-      <View style={styles.radiusBounds}>
-        <Text style={styles.radiusBoundText}>{RADIUS_MIN} m</Text>
-        <Text style={styles.radiusBoundText}>1 km</Text>
+          return (
+            <AnimatedPressable
+              key={option}
+              style={[styles.chip, selected && styles.chipSelected]}
+              onPress={() => onChangeRadius(option)}
+            >
+              <Text
+                style={[styles.chipText, selected && styles.chipTextSelected]}
+              >
+                {formatRadiusLabel(option)}
+              </Text>
+            </AnimatedPressable>
+          );
+        })}
       </View>
 
       {canSave ? (
@@ -140,6 +177,32 @@ export default function PlaceFormFields({
 }
 
 const styles = StyleSheet.create({
+  emojiRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.md,
+    marginBottom: theme.spacing.lg,
+  },
+
+  emojiInput: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: theme.colors.primaryMuted,
+    borderWidth: theme.borderWidth,
+    borderColor: theme.colors.border,
+    textAlign: "center",
+    textAlignVertical: "center",
+    fontSize: 24,
+    padding: 0,
+  },
+
+  emojiHint: {
+    ...theme.typography.caption,
+    flex: 1,
+    color: theme.colors.textMuted,
+  },
+
   chips: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -197,31 +260,16 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
   },
 
-  radiusValueRow: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    gap: 7,
-  },
-
-  radiusValue: {
-    ...theme.typography.sectionTitle,
-    color: theme.colors.primary,
-  },
-
   radiusWalk: {
     ...theme.typography.caption,
     color: theme.colors.textMuted,
   },
 
-  radiusBounds: {
+  radiusOptions: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: -2,
-  },
-
-  radiusBoundText: {
-    fontSize: 11.5,
-    color: theme.colors.textMuted,
+    flexWrap: "wrap",
+    gap: theme.spacing.sm,
+    marginTop: theme.spacing.sm,
   },
 
   saveButton: {

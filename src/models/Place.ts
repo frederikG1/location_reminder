@@ -2,6 +2,7 @@ export type Place = {
   id: string;
   name: string;
   note?: string;
+  emoji?: string;
 
   latitude: number;
   longitude: number;

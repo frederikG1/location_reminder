@@ -53,6 +53,7 @@ export default function OnboardingScreen() {
   const [name, setName] = useState("");
   const [note, setNote] = useState("");
   const [radius, setRadius] = useState(RADIUS_DEFAULT);
+  const [emoji, setEmoji] = useState("");
 
   const [pinnedCoords, setPinnedCoords] = useState<Coords | null>(null);
   const [isWatching, setIsWatching] = useState(false);
@@ -140,6 +141,7 @@ export default function OnboardingScreen() {
       await create({
         name: name.trim(),
         note: note.trim() || undefined,
+        emoji: emoji || undefined,
         latitude: coords.latitude,
         longitude: coords.longitude,
         radius,
@@ -189,7 +191,7 @@ export default function OnboardingScreen() {
   }
 
   const placeName = name.trim() || "dit sted";
-  const emoji = getPlaceEmoji(name);
+  const displayEmoji = emoji || getPlaceEmoji(name);
   const locationLabel = address ? `${address} — dig` : "Her er du";
 
   return (
@@ -215,7 +217,7 @@ export default function OnboardingScreen() {
               description={note}
             >
               <View style={styles.pin}>
-                <Text style={styles.pinEmoji}>{emoji}</Text>
+                <Text style={styles.pinEmoji}>{displayEmoji}</Text>
               </View>
             </Marker>
           ) : null}
@@ -292,9 +294,11 @@ export default function OnboardingScreen() {
                   name={name}
                   note={note}
                   radius={radius}
+                  emoji={emoji}
                   onChangeName={setName}
                   onChangeNote={setNote}
                   onChangeRadius={setRadius}
+                  onChangeEmoji={setEmoji}
                   onSave={handleSave}
                   showSuggestions
                 />
@@ -308,7 +312,7 @@ export default function OnboardingScreen() {
         <OnboardingSheet key="pinned">
           <View style={styles.pinnedHeader}>
             <View style={styles.pinnedAvatar}>
-              <Text style={styles.pinnedAvatarText}>{emoji}</Text>
+              <Text style={styles.pinnedAvatarText}>{displayEmoji}</Text>
             </View>
             <Text style={styles.heading}>{placeName} er gemt.</Text>
           </View>

@@ -10,10 +10,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 type Props = {
   visible: boolean;
   onClose: () => void;
-  onSave: (name: string, note: string, radius: number) => void;
+  onSave: (name: string, note: string, radius: number, emoji: string) => void;
   initialName?: string;
   initialNote?: string;
   initialRadius?: number;
+  initialEmoji?: string;
 };
 
 export default function CreatePlaceModal({
@@ -23,16 +24,19 @@ export default function CreatePlaceModal({
   initialName,
   initialNote,
   initialRadius,
+  initialEmoji,
 }: Props) {
   const [name, setName] = useState(initialName ?? "");
   const [note, setNote] = useState(initialNote ?? "");
   const [radius, setRadius] = useState(initialRadius ?? RADIUS_DEFAULT);
+  const [emoji, setEmoji] = useState(initialEmoji ?? "");
 
   useEffect(() => {
     setName(initialName ?? "");
     setNote(initialNote ?? "");
     setRadius(initialRadius ?? RADIUS_DEFAULT);
-  }, [initialName, initialNote, initialRadius, visible]);
+    setEmoji(initialEmoji ?? "");
+  }, [initialName, initialNote, initialRadius, initialEmoji, visible]);
 
   const isEditing = Boolean(initialName);
 
@@ -51,10 +55,12 @@ export default function CreatePlaceModal({
             name={name}
             note={note}
             radius={radius}
+            emoji={emoji}
             onChangeName={setName}
             onChangeNote={setNote}
             onChangeRadius={setRadius}
-            onSave={() => onSave(name, note, radius)}
+            onChangeEmoji={setEmoji}
+            onSave={() => onSave(name, note, radius, emoji)}
             showSuggestions={!isEditing}
             saveLabel={isEditing ? "Gem ændringer" : undefined}
           />
@@ -88,7 +94,7 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     color: theme.colors.textSecondary,
-    fontSize: 15,
-    fontWeight: "500",
+    fontSize: 20,
+    fontWeight: "600",
   },
 });
