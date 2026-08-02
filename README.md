@@ -1,50 +1,86 @@
-# Welcome to your Expo app 👋
+# Pin Me
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Gem et sted, og få en påmindelse næste gang du er i nærheden.
 
-## Get started
+An Expo / React Native app that turns saved locations into geofenced reminders.
+Save a place while you're standing there, give it a note, and iOS wakes the app
+with a notification the next time you come within its radius. All data lives on
+the device — there is no backend and nothing is uploaded.
 
-1. Install dependencies
+The UI is Danish (da-DK); code identifiers and comments are English.
 
-   ```bash
-   npm install
-   ```
+## Requirements
 
-2. Start the app
+- Node 20+
+- Xcode (iOS) / Android Studio (Android)
+- A **physical device** for anything involving geofencing — see below
 
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Getting started
 
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+```bash
+npm run start
+```
 
-## Learn more
+The app uses native modules (`expo-location`, `expo-notifications`,
+`react-native-maps`) and a custom dev client, so it does **not** run in Expo Go.
+Build it onto a device or simulator first:
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+npm run ios
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+If CocoaPods fails with `Encoding::CompatibilityError`, your shell isn't set to a
+UTF-8 locale:
 
-## Join the community
+```bash
+LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 npx expo run:ios
+```
 
-Join our community of developers creating universal apps.
+## Testing geofencing
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+**Background location and geofencing do not work in the iOS Simulator or most
+Android emulators.** Region-enter events are delivered by the OS to a headless
+JS context, which the simulator does not exercise realistically. Verify the core
+flow — save a place, leave, come back, get a notification — on real hardware.
+
+## Checks
+
+```bash
+npm run typecheck
+```
+
+```bash
+npm run lint
+```
+
+There is no test framework configured.
+
+## Builds
+
+Build profiles live in `eas.json`.
+
+```bash
+eas build --platform ios --profile preview
+```
+
+`preview` produces an internally-distributed build for registered devices;
+`production` produces a store build. `appVersionSource` is `remote`, so EAS owns
+the iOS build number — the `buildNumber` field in `app.json` is not used.
+
+## Other scripts
+
+```bash
+node scripts/generate-icons.mjs
+```
+
+Regenerates the app icon, splash and favicon in `assets/images/` from the pin SVG
+defined inside the script.
+
+## Architecture
+
+See [CLAUDE.md](CLAUDE.md) for a detailed tour of the routing, data model,
+geofencing paths and design-system rules.

@@ -9,13 +9,14 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.frederik.locationreminder",
       "buildNumber": "1",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Vi bruger din lokation til at gemme og finde dine steder.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "Tillad lokation i baggrunden, så vi kan minde dig om dine gemte steder, selv når appen ikke er åben.",
-        "UIBackgroundModes": ["location"]
+        "UIBackgroundModes": ["location"],
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -27,7 +28,11 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.frederik.locationreminder"
+      "package": "com.frederik.locationreminder",
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "output": "static",
@@ -54,6 +59,19 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "8176823a-4014-4f81-af6e-f4c1b8fe8dfd"
+      }
+    },
+    "owner": "frederikg25",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/8176823a-4014-4f81-af6e-f4c1b8fe8dfd"
     }
   }
 }
