@@ -1,4 +1,4 @@
-// Rask gangtempo, ~5 km/t.
+// Brisk walking pace, ~5 km/h.
 const METRES_PER_MINUTE = 83;
 
 /**
@@ -8,5 +8,5 @@ const METRES_PER_MINUTE = 83;
 export function formatWalkTime(radius: number) {
   const minutes = Math.max(1, Math.round(radius / METRES_PER_MINUTE));
 
-  return `ca. ${minutes} min gang`;
+  return `~${minutes} min walk`;
 }

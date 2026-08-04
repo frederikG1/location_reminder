@@ -8,9 +8,9 @@ export async function areRemindersPaused(): Promise<boolean> {
     const value = await AsyncStorage.getItem(REMINDERS_PAUSED_KEY);
     return value === "true";
   } catch (error) {
-    // Kan vi ikke læse indstillingen, er det mindre overraskende at påmindelser
-    // virker end at de tavst er slået fra.
-    log("Kunne ikke læse påmindelses-indstilling:", error);
+    // If we can't read the setting, reminders working is less surprising than
+    // them being silently turned off.
+    log("Couldn't read reminder setting:", error);
     return false;
   }
 }

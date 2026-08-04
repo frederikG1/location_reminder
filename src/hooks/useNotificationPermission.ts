@@ -3,9 +3,9 @@ import { AppState, Linking } from "react-native";
 import { hasNotificationPermission } from "../services/notifications";
 
 /**
- * Baggrundslokation uden notifikationstilladelse giver en helt tavs app: vi
- * registrerer besøg, men brugeren hører aldrig noget. Denne hook holder øje med
- * den reelle status, så hjemmeskærmen kan sige det højt.
+ * Background location without notification permission makes for a completely
+ * silent app: we log visits, but the user never hears anything. This hook
+ * watches the real status, so the home screen can say so out loud.
  */
 export function useNotificationPermission() {
   const [isGranted, setIsGranted] = useState<boolean | null>(null);
@@ -17,7 +17,7 @@ export function useNotificationPermission() {
   useEffect(() => {
     refresh();
 
-    // Tilladelsen kan være ændret i Indstillinger mens vi lå i baggrunden.
+    // The permission may have changed in Settings while we were backgrounded.
     const subscription = AppState.addEventListener("change", (state) => {
       if (state === "active") {
         refresh();
@@ -28,7 +28,7 @@ export function useNotificationPermission() {
   }, [refresh]);
 
   return {
-    /** Null indtil første tjek er færdigt, så intet blinker ved mount. */
+    /** Null until the first check resolves, so nothing flashes on mount. */
     needsPermission: isGranted === false,
     openSettings: () => Linking.openSettings(),
     refresh,

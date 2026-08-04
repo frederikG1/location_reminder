@@ -48,7 +48,7 @@ type Step =
 
 type Coords = { latitude: number; longitude: number };
 
-/** Grebets egen højde plus dets marginer — 5 - 6 + 16. */
+/** The grabber's own height plus its margins — 5 - 6 + 16. */
 const HANDLE_ROW_HEIGHT = 15;
 
 export default function OnboardingScreen() {
@@ -74,23 +74,24 @@ export default function OnboardingScreen() {
   const keyboardHeight = useKeyboardHeight();
   const { height: windowHeight } = useWindowDimensions();
 
-  // Konkrete pixeltal frem for procent. "88%" måler mod hele skærmen — også
-  // mens tastaturet dækker halvdelen — så arket blev ved med at være
-  // fuldskærmshøjt, mens det blev skubbet op: det er derfor overskriften endte
-  // oppe i statuslinjen. Her trækkes tastaturet fra først.
+  // Concrete pixel values rather than percentages. "88%" measures against the
+  // whole screen — including while the keyboard covers half of it — so the
+  // sheet stayed full-screen tall while being pushed up: that is how the
+  // heading ended up in the status bar. Here the keyboard is subtracted first.
   const formAvailableHeight = windowHeight - keyboardHeight;
   const formSheetMaxHeight = Math.round(formAvailableHeight * 0.9);
 
-  // Uden tastatur skal bundpolstringen rydde home-indikatoren. Med tastatur
-  // ville præcis samme polstring bare være dødt rum oven på tasterne.
+  // Without a keyboard the bottom padding has to clear the home indicator.
+  // With one, that exact same padding would just be dead space on top of the
+  // keys.
   const formSheetPaddingBottom =
     keyboardHeight > 0
       ? theme.spacing.lg
       : Math.max(insets.bottom, theme.spacing.xl) + 16;
 
-  // ScrollView'en skal have sin EGEN grænse, fratrukket alt det arket selv
-  // fylder — ellers kan de tilsammen blive højere end arket må være, og bunden
-  // bliver klippet væk i stedet for at kunne scrolles til.
+  // The ScrollView needs its OWN limit, minus everything the sheet itself
+  // takes up — otherwise the two together can exceed the sheet's allowed
+  // height, and the bottom gets clipped away instead of being scrollable to.
   const formScrollMaxHeight =
     formSheetMaxHeight -
     formSheetPaddingBottom -
@@ -182,8 +183,8 @@ export default function OnboardingScreen() {
       setStep("pinned");
     } catch {
       Alert.alert(
-        "Kunne ikke gemme sted",
-        "Tjek at lokation er slået til, og prøv igen.",
+        "Couldn't save place",
+        "Check that location is turned on, then try again.",
       );
     } finally {
       setBusy(false);
@@ -198,7 +199,7 @@ export default function OnboardingScreen() {
 
       if (granted) {
         await requestNotificationPermissions();
-        // Arm it now, so "Holder øje med 1 sted" is true the moment it is shown.
+        // Arm it now, so "Watching 1 place" is true the moment it is shown.
         await syncGeofences(places);
       }
 
@@ -221,9 +222,9 @@ export default function OnboardingScreen() {
     router.replace("/");
   }
 
-  const placeName = name.trim() || "dit sted";
+  const placeName = name.trim() || "your place";
   const displayEmoji = emoji || getPlaceEmoji(name);
-  const locationLabel = address ? `${address} — dig` : "Her er du";
+  const locationLabel = address ? `${address} — you` : "You are here";
 
   return (
     <View style={styles.container}>
@@ -272,19 +273,19 @@ export default function OnboardingScreen() {
         <OnboardingSheet key="intro">
           <View style={styles.kickerPill}>
             <View style={styles.kickerDot} />
-            <Text style={styles.kickerText}>Tre trin, så aldrig mere</Text>
+            <Text style={styles.kickerText}>Three steps, then never again</Text>
           </View>
 
-          <Text style={styles.title}>Din telefon ved altid hvor du er.</Text>
+          <Text style={styles.title}>Your phone always knows where you are.</Text>
 
           <Text style={styles.body}>
             {permissionDenied
-              ? "Uden adgang til din lokation kan appen hverken gemme steder eller minde dig om dem. Du kan give adgang nu — eller senere under Indstillinger."
-              : "Lad den bruge det til noget venligt: et prik på skulderen, når du er tæt på det sted, som du synes så interessant ud"}
+              ? "Without access to your location, the app can neither save places nor remind you about them. You can allow it now — or later under Settings."
+              : "Let it use that for something kind: a tap on the shoulder when you're close to the place that looked so interesting"}
           </Text>
 
           <PrimaryButton
-            label={permissionDenied ? "Prøv igen" : "Vis mig kortet"}
+            label={permissionDenied ? "Try again" : "Show me the map"}
             onPress={handleShowMap}
             busy={busy}
           />
@@ -293,15 +294,15 @@ export default function OnboardingScreen() {
 
       {step === "stand" ? (
         <OnboardingSheet key="stand">
-          <Text style={styles.titleSm}>Tryk på gem-knappen nedenunder for at fortsætte.</Text>
+          <Text style={styles.titleSm}>Tap the save button below to continue.</Text>
 
           <Text style={styles.body}>
-            Ét tryk gemmer det. Navnet, afstanden og påmindelsen kommer
-            bagefter.
+            One tap saves it. The name, the distance and the reminder come
+            afterwards.
           </Text>
 
           <PrimaryButton
-            label="Gem dette sted"
+            label="Save this place"
             onPress={() => setStep("form")}
           />
         </OnboardingSheet>
@@ -309,19 +310,19 @@ export default function OnboardingScreen() {
 
       {step === "form" ? (
         /*
-          Ingen KeyboardAvoidingView: arket er absolut placeret, og dens
-          padding-adfærd og `bottom: 0` trak i hver sin retning — den gjorde
-          arket højere frem for at give det mindre plads. Her lægges arket i
-          stedet direkte oven på tastaturet med `bottom`, og højderne er regnet
-          ud mod den plads der reelt er tilbage.
+          No KeyboardAvoidingView: the sheet is absolutely positioned, and its
+          padding behaviour and `bottom: 0` pulled in opposite directions — it
+          made the sheet taller instead of giving it less room. Here the sheet
+          is placed directly on top of the keyboard with `bottom` instead, and
+          the heights are calculated against the space that is actually left.
         */
         <OnboardingSheet
           key="form"
           handle
           style={{
             bottom: keyboardHeight,
-            // Overhænget lægges oven i grænsen, så den SYNLIGE højde stadig er
-            // formSheetMaxHeight.
+            // The overhang is added on top of the limit, so the VISIBLE height
+            // is still formSheetMaxHeight.
             maxHeight: formSheetMaxHeight + SHEET_OVERHANG,
             paddingBottom: formSheetPaddingBottom + SHEET_OVERHANG,
           }}
@@ -331,7 +332,7 @@ export default function OnboardingScreen() {
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <Text style={styles.sectionTitle}>Hvad er her?</Text>
+            <Text style={styles.sectionTitle}>What&apos;s here?</Text>
 
             <View style={styles.formFields}>
               <PlaceFormFields
@@ -357,17 +358,17 @@ export default function OnboardingScreen() {
             <View style={styles.pinnedAvatar}>
               <Text style={styles.pinnedAvatarText}>{displayEmoji}</Text>
             </View>
-            <Text style={styles.heading}>{placeName} er gemt.</Text>
+            <Text style={styles.heading}>{placeName} is saved.</Text>
           </View>
 
           <Text style={styles.body}>
-            Det var trin ét og to. Trin tre er hele grunden til at du er her: et
-            prik indenfor {radius} m — også med appen lukket og telefonen i
-            lommen.
+            That was step one and two. Step three is the whole reason
+            you&apos;re here: a nudge within {radius} m — even with the app
+            closed and the phone in your pocket.
           </Text>
 
           <PrimaryButton
-            label="Sæt påmindelsen op"
+            label="Set up the reminder"
             onPress={handleEnableReminders}
             busy={busy}
           />
@@ -376,9 +377,9 @@ export default function OnboardingScreen() {
             style={styles.skipButton}
             onPress={handleSkipReminders}
             accessibilityRole="button"
-            accessibilityLabel="Kun når appen er åben"
+            accessibilityLabel="Only when the app is open"
           >
-            <Text style={styles.skipButtonText}>Kun når appen er åben</Text>
+            <Text style={styles.skipButtonText}>Only when the app is open</Text>
           </AnimatedPressable>
         </OnboardingSheet>
       ) : null}
@@ -388,21 +389,21 @@ export default function OnboardingScreen() {
           <View style={styles.kickerRow}>
             <View style={styles.kickerDot} />
             <Text style={styles.kickerText}>
-              {isWatching ? "Holder øje med 1 sted" : "Gemt, men ikke aktivt"}
+              {isWatching ? "Watching 1 place" : "Saved, but not active"}
             </Text>
           </View>
 
           <Text style={styles.titleSm}>
-            {isWatching ? "Luk så appen.\nHelt seriøst." : "Så er du i gang."}
+            {isWatching ? "Now close the app.\nSeriously." : "You're all set."}
           </Text>
 
           <Text style={styles.body}>
             {isWatching
-              ? `${note.trim() || "Påmindelsen"} ved ${placeName}, ${radius} m. Du hører fra mig, når det er relevant.`
-              : `${placeName} er gemt, men uden lokation i baggrunden kan appen kun minde dig om det, mens den er åben. Du kan slå det til under Indstillinger, når du vil.`}
+              ? `${note.trim() || "The reminder"} at ${placeName}, ${radius} m. You'll hear from me when it matters.`
+              : `${placeName} is saved, but without background location the app can only remind you while it's open. You can turn it on under Settings whenever you like.`}
           </Text>
 
-          <PrimaryButton label="Færdig" onPress={handleFinish} dark />
+          <PrimaryButton label="Done" onPress={handleFinish} dark />
         </OnboardingSheet>
       ) : null}
     </View>

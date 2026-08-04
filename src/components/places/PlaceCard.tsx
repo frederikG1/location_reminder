@@ -5,10 +5,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, Text, View } from "react-native";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import "dayjs/locale/da";
 
 dayjs.extend(relativeTime);
-dayjs.locale("da");
 
 type Props = {
   place: Place;
@@ -19,18 +17,19 @@ export function getPlaceEmoji(name: string) {
   const lower = name.toLowerCase();
 
   if (
-    lower.includes("netto") ||
-    lower.includes("føtex") ||
+    lower.includes("grocer") ||
+    lower.includes("market") ||
     lower.includes("super") ||
-    lower.includes("butik")
+    lower.includes("shop") ||
+    lower.includes("store")
   ) {
     return "🛒";
   }
 
   if (
-    lower.includes("kaffe") ||
+    lower.includes("coffee") ||
     lower.includes("cafe") ||
-    lower.includes("coffee")
+    lower.includes("café")
   ) {
     return "☕";
   }
@@ -38,16 +37,16 @@ export function getPlaceEmoji(name: string) {
   if (
     lower.includes("gym") ||
     lower.includes("fitness") ||
-    lower.includes("træning")
+    lower.includes("workout")
   ) {
     return "🏋️";
   }
 
   if (
-    lower.includes("hjem") ||
     lower.includes("home") ||
-    lower.includes("mor") ||
-    lower.includes("far")
+    lower.includes("mum") ||
+    lower.includes("mom") ||
+    lower.includes("dad")
   ) {
     return "🏠";
   }

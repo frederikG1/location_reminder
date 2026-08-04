@@ -6,20 +6,20 @@ type ProximityStatus = {
 export function getProximityStatus(distance: number): ProximityStatus {
   if (distance <= 50) {
     return {
-      label: "Fremme",
+      label: "Arrived",
       color: "#34C759",
     };
   }
 
   if (distance <= 150) {
     return {
-      label: "Tæt på",
+      label: "Close by",
       color: "#FF9500",
     };
   }
 
   return {
-    label: "I nærheden",
+    label: "Nearby",
     color: "#0A84FF",
   };
 }

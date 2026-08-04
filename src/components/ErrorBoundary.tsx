@@ -7,9 +7,9 @@ type Props = { children: ReactNode };
 type State = { hasError: boolean };
 
 /**
- * Uden denne bliver en fejl under rendering til en permanent hvid skærm uden
- * nogen antydning af hvad der gik galt. Nulstilling af state monterer træet
- * igen, hvilket er nok til at komme videre fra en forbigående fejl.
+ * Without this, an error during rendering becomes a permanent white screen
+ * with no hint of what went wrong. Resetting state mounts the tree again,
+ * which is enough to get past a transient failure.
  */
 export default class ErrorBoundary extends Component<Props, State> {
   state: State = { hasError: false };
@@ -19,7 +19,7 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    log("Uventet fejl:", error, info.componentStack);
+    log("Unexpected error:", error, info.componentStack);
   }
 
   render() {
@@ -29,18 +29,18 @@ export default class ErrorBoundary extends Component<Props, State> {
 
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>Ups, noget gik galt</Text>
+        <Text style={styles.title}>Oops, something went wrong</Text>
         <Text style={styles.body}>
-          Appen stødte på en uventet fejl. Dine gemte steder er der stadig.
+          The app hit an unexpected error. Your saved places are still there.
         </Text>
 
         <Pressable
           style={styles.button}
           onPress={() => this.setState({ hasError: false })}
           accessibilityRole="button"
-          accessibilityLabel="Prøv igen"
+          accessibilityLabel="Try again"
         >
-          <Text style={styles.buttonText}>Prøv igen</Text>
+          <Text style={styles.buttonText}>Try again</Text>
         </Pressable>
       </View>
     );

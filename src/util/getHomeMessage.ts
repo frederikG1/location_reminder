@@ -3,12 +3,12 @@ export function getHomeMessage(
   nearestPlaceName?: string
 ) {
   if (nearbyPlacesCount === 0) {
-    return "Ingen steder i nærheden lige nu.";
+    return "No places nearby right now.";
   }
 
   if (nearbyPlacesCount === 1) {
-    return `Du er nær ${nearestPlaceName}.`;
+    return `You're near ${nearestPlaceName}.`;
   }
 
-  return `Du har ${nearbyPlacesCount} steder i nærheden.`;
+  return `You have ${nearbyPlacesCount} places nearby.`;
 }

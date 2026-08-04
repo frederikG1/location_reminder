@@ -99,8 +99,8 @@ export default function HomeScreen() {
       setCreateModalVisible(false);
     } catch {
       Alert.alert(
-        "Kunne ikke gemme sted",
-        "Tjek at lokation er slået til, og prøv igen.",
+        "Couldn't save place",
+        "Check that location is turned on, then try again.",
       );
     }
   }
@@ -128,16 +128,16 @@ export default function HomeScreen() {
       >
         {needsPermission ? (
           <PermissionNotice
-            title="Påmindelser er slået fra"
-            message="Uden lokation i baggrunden kan vi kun minde dig om dine steder, mens appen er åben. Tryk for at slå det til."
+            title="Reminders are off"
+            message="Without background location we can only remind you about your places while the app is open. Tap to turn it on."
             onPress={showPermissionPrompt}
           />
         ) : null}
 
         {needsNotificationPermission ? (
           <PermissionNotice
-            title="Notifikationer er slået fra"
-            message="Vi registrerer dine besøg, men kan ikke sige til når du er i nærheden. Tryk for at åbne Indstillinger."
+            title="Notifications are off"
+            message="We still log your visits, but we can't tell you when you're nearby. Tap to open Settings."
             onPress={openNotificationSettings}
             delay={40}
           />
@@ -146,7 +146,7 @@ export default function HomeScreen() {
         {locationError ? (
           <FadeInView delay={80} style={styles.locationError}>
             <Text style={styles.locationErrorText}>
-              Kan ikke finde din position lige nu. Træk ned for at prøve igen.
+              Can&apos;t find your location right now. Pull down to try again.
             </Text>
           </FadeInView>
         ) : null}
@@ -154,22 +154,22 @@ export default function HomeScreen() {
         {places.length > MAX_MONITORED_REGIONS ? (
           <FadeInView delay={80} style={styles.locationError}>
             <Text style={styles.locationErrorText}>
-              Du har {places.length} steder. iOS kan kun overvåge{" "}
-              {MAX_MONITORED_REGIONS} ad gangen, så vi holder øje med de{" "}
-              {MAX_MONITORED_REGIONS} nærmeste.
+              You have {places.length} places. iOS can only watch{" "}
+              {MAX_MONITORED_REGIONS} at a time, so we&apos;re keeping an eye on
+              the {MAX_MONITORED_REGIONS} nearest ones.
             </Text>
           </FadeInView>
         ) : null}
 
         <NearbyPlacesSection nearbyPlaces={nearbyPlaces} />
 
-        <Text style={styles.sectionTitle}>Mine steder</Text>
+        <Text style={styles.sectionTitle}>My places</Text>
 
         {places.length === 0 ? (
           <FadeInView delay={80} style={styles.emptyState}>
             <Text style={styles.emptyStateText}>
-              Gem dit første sted, så du kan blive mindet om det, næste gang du
-              er i nærheden.
+              Save your first place, and we&apos;ll remind you about it the next
+              time you&apos;re nearby.
             </Text>
           </FadeInView>
         ) : (
@@ -201,18 +201,18 @@ export default function HomeScreen() {
           style={styles.secondaryButton}
           onPress={() => router.push("/map")}
           accessibilityRole="button"
-          accessibilityLabel="Åbn kort"
+          accessibilityLabel="Open map"
         >
-          <Text style={styles.secondaryButtonText}>Åbn kort</Text>
+          <Text style={styles.secondaryButtonText}>Open map</Text>
         </AnimatedPressable>
 
         <AnimatedPressable
           style={styles.primaryButton}
           onPress={() => setCreateModalVisible(true)}
           accessibilityRole="button"
-          accessibilityLabel="Gem nyt sted"
+          accessibilityLabel="Save new place"
         >
-          <Text style={styles.primaryButtonText}>+ Gem nyt sted</Text>
+          <Text style={styles.primaryButtonText}>+ Save new place</Text>
         </AnimatedPressable>
       </View>
 
@@ -231,9 +231,10 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
 
-  // Centraliseret her i stedet for per sektion — PlaceCard i "Mine steder"
-  // rendere direkte som barn af ScrollView'en og har selv ingen ydre margin,
-  // så uden denne ville dens kant og runding gå helt ud til skærmkanten.
+  // Centralised here rather than per section — PlaceCard under "My places"
+  // renders directly as a child of the ScrollView and has no outer margin of
+  // its own, so without this its border and rounding would run all the way out
+  // to the screen edge.
   scrollContent: {
     paddingBottom: 140,
     paddingHorizontal: theme.spacing.xl,

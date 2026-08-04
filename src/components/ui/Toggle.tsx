@@ -22,9 +22,9 @@ type Props = {
 };
 
 /**
- * Kontakten fra designet. React Natives egen `Switch` kan hverken få en kant
- * eller en anden form, og en kantløs kontakt ville være det eneste element i
- * appen uden den mørke streg omkring sig.
+ * The switch from the design. React Native's own `Switch` can take neither a
+ * border nor a different shape, and a borderless switch would be the only
+ * element in the app without the dark outline around it.
  */
 export default function Toggle({
   value,

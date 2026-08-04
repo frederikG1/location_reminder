@@ -16,9 +16,9 @@ export function useOnboardingStatus() {
       try {
         completed = await hasCompletedOnboarding();
       } catch (error) {
-        // Uden dette ville status blive stående på "loading", og hjemmeskærmen
-        // ville rendere null for evigt — en hvid skærm uden vej ud.
-        log("Kunne ikke afgøre onboarding-status:", error);
+        // Without this, status would stay on "loading" and the home screen
+        // would render null forever — a white screen with no way out.
+        log("Couldn't determine onboarding status:", error);
       }
 
       if (!cancelled) {

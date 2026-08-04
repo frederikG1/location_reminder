@@ -13,8 +13,8 @@ export async function savePlace(place: Place) {
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
 }
 
-// En beskadiget eller halvskrevet blob må ikke kunne vælte appen. Vi falder
-// tilbage til en tom liste frem for at lade en SyntaxError boble op i UI'et.
+// A corrupt or half-written blob must not be able to topple the app. We fall
+// back to an empty list rather than letting a SyntaxError bubble up into the UI.
 export async function getPlaces(): Promise<Place[]> {
   try {
     const data = await AsyncStorage.getItem(STORAGE_KEY);
@@ -27,7 +27,7 @@ export async function getPlaces(): Promise<Place[]> {
 
     return Array.isArray(parsed) ? parsed : [];
   } catch (error) {
-    log("Kunne ikke læse steder:", error);
+    log("Couldn't read places:", error);
     return [];
   }
 }

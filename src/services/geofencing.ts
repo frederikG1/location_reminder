@@ -4,14 +4,15 @@ import { GEOFENCING_TASK_NAME } from "@/src/tasks/geofencingTask";
 import { log } from "@/src/util/logger";
 import * as Location from "expo-location";
 
-// iOS overvåger højst 20 regioner per app. Regioner derudover afvises tavst af
-// systemet, så vi vælger selv de 20 nærmeste frem for at lade OS'et gætte.
+// iOS monitors at most 20 regions per app. Regions beyond that are silently
+// rejected by the system, so we pick the 20 nearest ourselves rather than
+// letting the OS guess.
 export const MAX_MONITORED_REGIONS = 20;
 
 let lastSyncedSignature: string | null = null;
 
-// Signaturen dækker geometrien, ikke kun id'erne — ellers ville en redigeret
-// radius eller en flyttet markør aldrig nå ud til den armerede geofence.
+// The signature covers the geometry, not just the ids — otherwise an edited
+// radius or a moved marker would never reach the armed geofence.
 function buildSignature(places: Place[]): string {
   return places
     .map(
@@ -32,7 +33,7 @@ async function pickRegionsToMonitor(places: Place[]): Promise<Place[]> {
   try {
     origin = await Location.getLastKnownPositionAsync();
   } catch (error) {
-    log("Kunne ikke hente sidst kendte position:", error);
+    log("Couldn't get last known position:", error);
   }
 
   if (!origin) {
@@ -59,14 +60,14 @@ async function stopIfRunning(): Promise<void> {
       await Location.stopGeofencingAsync(GEOFENCING_TASK_NAME);
     }
   } catch (error) {
-    log("Kunne ikke stoppe geofencing:", error);
+    log("Couldn't stop geofencing:", error);
   }
 }
 
 /**
- * Armerer geofences for de givne steder. Returnerer antallet af regioner der
- * faktisk blev armeret, så kalderen kan sige til når ikke alle steder kunne
- * overvåges.
+ * Arms geofences for the given places. Returns the number of regions that were
+ * actually armed, so the caller can speak up when not every place could be
+ * monitored.
  */
 export async function syncGeofences(places: Place[]): Promise<number> {
   const signature = buildSignature(places);
@@ -98,9 +99,10 @@ export async function syncGeofences(places: Place[]): Promise<number> {
     lastSyncedSignature = signature;
     return regions.length;
   } catch (error) {
-    // Lad ikke signaturen stå som synkroniseret — næste forsøg skal prøve igen.
+    // Don't leave the signature marked as synced — the next attempt has to try
+    // again.
     lastSyncedSignature = null;
-    log("Kunne ikke starte geofencing:", error);
+    log("Couldn't start geofencing:", error);
     return 0;
   }
 }

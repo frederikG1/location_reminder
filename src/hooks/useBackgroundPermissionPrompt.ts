@@ -8,9 +8,9 @@ import { requestNotificationPermissions } from "../services/notifications";
 
 /**
  * Drives the "reminders are off" path on the home screen. Keyed off the real
- * permission state rather than a one-shot flag, so someone who chose "kun når
- * appen er åben" during the first run always has a way back — and the prompt
- * disappears by itself once they grant it.
+ * permission state rather than a one-shot flag, so someone who chose "only
+ * when the app is open" during the first run always has a way back — and the
+ * prompt disappears by itself once they grant it.
  */
 export function useBackgroundPermissionPrompt() {
   const [isGranted, setIsGranted] = useState<boolean | null>(null);

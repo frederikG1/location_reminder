@@ -10,8 +10,8 @@ type Props = {
 };
 
 /**
- * Samme cirkel som indstillingsknappen på forsiden — det er den form appen
- * bruger til "en enkelt handling", og en tilbageknap er ikke en undtagelse.
+ * The same circle as the settings button on the home screen — that is the
+ * shape the app uses for "a single action", and a back button is no exception.
  */
 export default function BackButton({ style, onPress }: Props) {
   return (
@@ -19,7 +19,7 @@ export default function BackButton({ style, onPress }: Props) {
       style={[styles.button, style]}
       onPress={onPress ?? goBack}
       accessibilityRole="button"
-      accessibilityLabel="Tilbage"
+      accessibilityLabel="Back"
       hitSlop={10}
     >
       <Ionicons
@@ -33,9 +33,9 @@ export default function BackButton({ style, onPress }: Props) {
 }
 
 /**
- * En notifikation kan åbne et sted direkte. Sker det ved koldstart, er der
- * ikke nødvendigvis noget at gå tilbage til — og uden faldet her ville
- * knappen se ud som om den virkede uden at gøre noget.
+ * A notification can open a place directly. When that happens on a cold start
+ * there isn't necessarily anything to go back to — and without the fallback
+ * here the button would look like it worked while doing nothing.
  */
 function goBack() {
   if (router.canGoBack()) {
@@ -57,8 +57,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  // Chevronen har mere luft i højre side af sit eget glyf-felt end i venstre,
-  // så den lander optisk skævt i en cirkel uden det her lille skub.
+  // The chevron has more air on the right of its own glyph box than on the
+  // left, so it lands optically off-centre in a circle without this small nudge.
   icon: {
     marginLeft: -2,
   },

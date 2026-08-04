@@ -13,8 +13,8 @@
       "bundleIdentifier": "com.frederik.locationreminder",
       "buildNumber": "1",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "Vi bruger din lokation til at gemme og finde dine steder.",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "Tillad lokation i baggrunden, så vi kan minde dig om dine gemte steder, selv når appen ikke er åben.",
+        "NSLocationWhenInUseUsageDescription": "We use your location to save and find your places.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Allow background location, so we can remind you about your saved places even when the app isn't open.",
         "UIBackgroundModes": ["location"],
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -42,7 +42,7 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Tillad lokation i baggrunden, så vi kan minde dig om dine gemte steder, selv når appen ikke er åben."
+          "locationAlwaysAndWhenInUsePermission": "Allow background location, so we can remind you about your saved places even when the app isn't open."
         }
       ],
       "expo-router",

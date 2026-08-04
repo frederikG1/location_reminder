@@ -17,7 +17,7 @@ export async function getVisits(): Promise<Visit[]> {
 
     return Array.isArray(parsed) ? parsed : [];
   } catch (error) {
-    log("Kunne ikke læse besøg:", error);
+    log("Couldn't read visits:", error);
     return [];
   }
 }

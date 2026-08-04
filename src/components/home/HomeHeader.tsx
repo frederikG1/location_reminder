@@ -19,11 +19,11 @@ export default function HomeHeader({
   function getGreeting() {
     const hour = new Date().getHours();
 
-    if (hour < 5) return "God nat";
-    if (hour < 12) return "Godmorgen";
-    if (hour < 18) return "God eftermiddag";
+    if (hour < 5) return "Good night";
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
 
-    return "God aften";
+    return "Good evening";
   }
 
   return (
@@ -35,7 +35,7 @@ export default function HomeHeader({
           style={styles.settingsButton}
           onPress={onOpenSettings}
           accessibilityRole="button"
-          accessibilityLabel="Indstillinger"
+          accessibilityLabel="Settings"
         >
           <Ionicons
             name="settings-outline"

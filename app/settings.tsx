@@ -38,7 +38,7 @@ export default function SettingsScreen() {
     setPaused(next);
     await setRemindersPaused(next);
 
-    // Kontakten skal virke med det samme, ikke først næste gang appen starter.
+    // The switch has to take effect right away, not on the next app launch.
     if (next) {
       await stopAllGeofencing();
     } else {
@@ -50,12 +50,12 @@ export default function SettingsScreen() {
 
   function handleDeleteEverything() {
     Alert.alert(
-      "Slet alle data?",
-      `Dine ${places.length} steder og hele besøgshistorikken slettes. Det kan ikke fortrydes.`,
+      "Delete all data?",
+      `Your ${places.length} places and your entire visit history will be deleted. This cannot be undone.`,
       [
-        { text: "Annuller", style: "cancel" },
+        { text: "Cancel", style: "cancel" },
         {
-          text: "Slet alt",
+          text: "Delete everything",
           style: "destructive",
           onPress: async () => {
             await stopAllGeofencing();
@@ -72,12 +72,12 @@ export default function SettingsScreen() {
 
   function handleReplayOnboarding() {
     Alert.alert(
-      "Vis introduktionen igen?",
-      "Dine gemte steder bliver ikke rørt.",
+      "Show the intro again?",
+      "Your saved places won't be touched.",
       [
-        { text: "Annuller", style: "cancel" },
+        { text: "Cancel", style: "cancel" },
         {
-          text: "Vis igen",
+          text: "Show again",
           onPress: async () => {
             await resetOnboarding();
             router.replace("/onboarding");
@@ -94,21 +94,21 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
-      <ScreenHeader title="Indstillinger" />
+      <ScreenHeader title="Settings" />
 
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.sectionTitle}>Påmindelser</Text>
+        <Text style={styles.sectionTitle}>Reminders</Text>
 
         <View style={styles.card}>
           <View style={styles.row}>
             <View style={styles.rowText}>
-              <Text style={styles.rowTitle}>Sæt påmindelser på pause</Text>
+              <Text style={styles.rowTitle}>Pause reminders</Text>
               <Text style={styles.rowSubtitle}>
-                Dine steder bliver gemt, men du får ingen besked når du er i
-                nærheden.
+                Your places stay saved, but you won&apos;t hear anything when
+                you&apos;re nearby.
               </Text>
             </View>
 
@@ -116,23 +116,23 @@ export default function SettingsScreen() {
               value={paused ?? false}
               onValueChange={handleTogglePause}
               disabled={paused === null}
-              accessibilityLabel="Sæt påmindelser på pause"
+              accessibilityLabel="Pause reminders"
             />
           </View>
         </View>
 
-        <Text style={styles.sectionTitle}>Tilladelser</Text>
+        <Text style={styles.sectionTitle}>Permissions</Text>
 
         <View style={styles.card}>
           <View style={styles.row}>
             <View style={styles.rowText}>
-              <Text style={styles.rowTitle}>Lokation i baggrunden</Text>
+              <Text style={styles.rowTitle}>Background location</Text>
               <Text style={styles.rowSubtitle}>
                 {hasBackground === null
-                  ? "Tjekker …"
+                  ? "Checking …"
                   : hasBackground
-                    ? "Slået til"
-                    : "Slået fra — påmindelser virker kun mens appen er åben"}
+                    ? "On"
+                    : "Off — reminders only work while the app is open"}
               </Text>
             </View>
           </View>
@@ -141,9 +141,9 @@ export default function SettingsScreen() {
 
           <View style={styles.row}>
             <View style={styles.rowText}>
-              <Text style={styles.rowTitle}>Notifikationer</Text>
+              <Text style={styles.rowTitle}>Notifications</Text>
               <Text style={styles.rowSubtitle}>
-                {needsNotifications ? "Slået fra" : "Slået til"}
+                {needsNotifications ? "Off" : "On"}
               </Text>
             </View>
           </View>
@@ -154,9 +154,9 @@ export default function SettingsScreen() {
             style={styles.action}
             onPress={handleOpenSettings}
             accessibilityRole="button"
-            accessibilityLabel="Åbn Indstillinger"
+            accessibilityLabel="Open Settings"
           >
-            <Text style={styles.actionText}>Åbn Indstillinger</Text>
+            <Text style={styles.actionText}>Open Settings</Text>
           </AnimatedPressable>
         </View>
 
@@ -167,9 +167,9 @@ export default function SettingsScreen() {
             style={styles.action}
             onPress={handleReplayOnboarding}
             accessibilityRole="button"
-            accessibilityLabel="Vis introduktionen igen"
+            accessibilityLabel="Show the intro again"
           >
-            <Text style={styles.actionText}>Vis introduktionen igen</Text>
+            <Text style={styles.actionText}>Show the intro again</Text>
           </AnimatedPressable>
 
           <View style={styles.divider} />
@@ -178,10 +178,10 @@ export default function SettingsScreen() {
             style={styles.action}
             onPress={handleDeleteEverything}
             accessibilityRole="button"
-            accessibilityLabel="Slet alle data"
+            accessibilityLabel="Delete all data"
           >
             <Text style={[styles.actionText, styles.destructiveText]}>
-              Slet alle data
+              Delete all data
             </Text>
           </AnimatedPressable>
         </View>
@@ -200,8 +200,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
 
-  // Ingen padding foroven — headeren sidder uden for ScrollView'en og har
-  // allerede sat afstanden, og den første sektionsoverskrift har sin egen
+  // No padding at the top — the header sits outside the ScrollView and has
+  // already set the spacing, and the first section title carries its own
   // marginTop.
   content: {
     paddingHorizontal: theme.spacing.xl,

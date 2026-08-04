@@ -46,7 +46,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       });
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Kunne ikke hente lokation",
+        err instanceof Error ? err.message : "Couldn't get your location",
       );
     } finally {
       setIsLoading(false);
@@ -86,7 +86,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       if (isMountedRef.current) {
         setError(
-          err instanceof Error ? err.message : "Kunne ikke hente lokation",
+          err instanceof Error ? err.message : "Couldn't get your location",
         );
         setIsLoading(false);
       }

@@ -11,9 +11,9 @@ import { useCallback, useEffect, useState } from "react";
 let geofencesSynced = false;
 
 /**
- * Tvinger næste montering til at armere geofences igen. Bruges når noget uden
- * for hooken ændrer forudsætningerne — f.eks. når påmindelser sættes på pause
- * eller slippes løs igen fra indstillingerne.
+ * Forces the next mount to arm the geofences again. Used when something
+ * outside the hook changes the preconditions — e.g. when reminders are paused
+ * or let loose again from the settings screen.
  */
 export function invalidateGeofenceSync() {
   geofencesSynced = false;
@@ -91,8 +91,8 @@ export function usePlaces() {
         return;
       }
 
-      // Pausen sættes i indstillingerne og skal overleve genstart, så den
-      // tjekkes her frem for kun der hvor kontakten sidder.
+      // The pause is set in the settings screen and has to survive a restart,
+      // so it is checked here rather than only where the switch lives.
       if (await areRemindersPaused()) {
         await stopAllGeofencing();
       } else {

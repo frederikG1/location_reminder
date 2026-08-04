@@ -1,11 +1,11 @@
 /**
- * Afstand i meter → den korte form der står i nærheds-badget. Under en
- * kilometer rundes til nærmeste ti meter — GPS'en er alligevel ikke skarpere
- * end det, og "180 m" læses hurtigere end "183 m".
+ * Distance in meters → the short form shown in the proximity badge. Below a
+ * kilometer it rounds to the nearest ten meters — GPS isn't sharper than that
+ * anyway, and "180 m" reads faster than "183 m".
  */
 export function formatDistance(meters: number) {
   if (meters >= 1000) {
-    const km = (meters / 1000).toFixed(1).replace(".", ",");
+    const km = (meters / 1000).toFixed(1);
     return `${km} km`;
   }
 

@@ -6,9 +6,9 @@ import FadeInView from "./FadeInView";
 
 type Props = {
   /**
-   * Udelades, når skærmens indhold selv bærer overskriften — stedsiden viser
-   * allerede navnet stort med emoji, og "Sted" ovenover ville kun gentage det
-   * med et fladere ord.
+   * Omitted when the screen's content carries the heading itself — the place
+   * screen already shows the name large with an emoji, and "Place" above it
+   * would only repeat that in a flatter word.
    */
   title?: string;
   right?: ReactNode;
@@ -16,13 +16,14 @@ type Props = {
 };
 
 /**
- * Erstatter den native stak-header på de skærme der ikke er forsiden. Den
- * native er en hvid bjælke med systemets blå chevron og "Tilbage" — appen har
- * hverken hvide bjælker, blå eller systemskrift andre steder.
+ * Replaces the native stack header on every screen that isn't the home screen.
+ * The native one is a white bar with the system's blue chevron and "Back" —
+ * the app has neither white bars, nor blue, nor the system typeface anywhere
+ * else.
  *
- * Titlen står under knappen frem for ved siden af, så den kan være lige så
- * stor som forsidens overskrift. En centreret titel i en bjælke ville tvinge
- * den ned i en størrelse ingen andre overskrifter i appen har.
+ * The title sits below the button rather than beside it, so it can be just as
+ * large as the home screen's heading. A centred title in a bar would force it
+ * down to a size no other heading in the app has.
  */
 export default function ScreenHeader({ title, right, onBack }: Props) {
   return (

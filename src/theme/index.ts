@@ -4,9 +4,9 @@ export const theme = {
     surface: "#FFFFFF",
     surfaceAlt: "#FFF4DE",
     primary: "#FF9500",
-    // Orange som TEKST eller IKON — aldrig `primary`, der kun giver 2.0:1 mod
-    // cremebaggrunden. Denne er 4.5:1 mod creme og 4.9:1 mod hvid.
-    // `primary` er stadig den rigtige til fyld, kanter, prikker og knapflader.
+    // Orange as TEXT or ICON — never `primary`, which only gives 2.0:1 against
+    // the cream background. This one is 4.5:1 on cream and 4.9:1 on white.
+    // `primary` is still the right pick for fills, borders, dots and buttons.
     primaryStrong: "#B05A00",
     primaryMuted: "#FFF4DE",
     primaryText: "#1A1200", // orange buttons use dark text, not white
@@ -17,11 +17,12 @@ export const theme = {
     primaryFill: "rgba(255, 149, 0, 0.2)",
     ringFill: "rgba(255, 149, 0, 0.2)",
     locationDot: "#0A84FF",
-    mapSurface: "#F3E7CE", // bag kortet indtil fliserne er hentet
+    mapSurface: "#F3E7CE", // behind the map until the tiles have loaded
     textPrimary: "#1A1200",
     textSecondary: "#8A6A2A",
-    // Var #B99457, som kun gav 2.6:1 mod baggrunden — under WCAG AA's 4.5:1 for
-    // små tekster. Hierarkiet bæres nu af skriftstørrelse og vægt, ikke farve.
+    // Was #B99457, which only gave 2.6:1 against the background — below WCAG
+    // AA's 4.5:1 for small text. Hierarchy is now carried by type size and
+    // weight, not colour.
     textMuted: "#8A6A2A",
     border: "#1A1200", // thick outline, not a hairline
     inputBg: "#FFF4DE",
@@ -45,11 +46,11 @@ export const theme = {
     xl: 20,
     xxl: 24,
   },
-  // React Native kan ikke vælge vægt inden for en custom fontfamilie — hver
-  // vægt ER sin egen familie. Derfor sætter tokens herunder `fontFamily` og
-  // ikke `fontWeight`: kombinerer man begge, syntetiserer iOS oven i den
-  // allerede fede skrift. Rendering er gated på at fonten er loadet
-  // (app/_layout.tsx), så der er aldrig et vindue uden den.
+  // React Native cannot pick a weight within a custom font family — each
+  // weight IS its own family. That is why the tokens below set `fontFamily`
+  // and not `fontWeight`: combining the two makes iOS synthesise weight on top
+  // of an already-heavy face. Rendering is gated on the font being loaded
+  // (app/_layout.tsx), so there is never a window without it.
   fonts: {
     semibold: "Nunito_600SemiBold",
     bold: "Nunito_700Bold",

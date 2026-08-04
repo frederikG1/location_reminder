@@ -3,9 +3,9 @@ import * as Notifications from "expo-notifications";
 import { useEffect, useRef } from "react";
 
 /**
- * Sender brugeren hen til det sted en notifikation handler om. Dækker både kold
- * start og app i baggrunden, fordi useLastNotificationResponse holder på det
- * seneste tryk indtil vi har handlet på det.
+ * Sends the user to the place a notification is about. Covers both a cold
+ * start and a backgrounded app, because useLastNotificationResponse holds on
+ * to the most recent tap until we have acted on it.
  */
 export function useNotificationDeepLink() {
   const response = Notifications.useLastNotificationResponse();
@@ -13,14 +13,14 @@ export function useNotificationDeepLink() {
   const handledIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    // Ved kold start monteres layoutet før navigatoren er klar; navigerer vi
-    // der, forsvinder ruten tavst.
+    // On a cold start the layout mounts before the navigator is ready; if we
+    // navigate then, the route silently disappears.
     if (!response || !navigationState?.key) {
       return;
     }
 
-    // Hooken beholder samme svar på tværs af renders — uden denne vagt ville vi
-    // navigere igen hver gang træet gentegnes.
+    // The hook keeps the same response across renders — without this guard we
+    // would navigate again every time the tree re-renders.
     const notificationId = response.notification.request.identifier;
 
     if (handledIdRef.current === notificationId) {

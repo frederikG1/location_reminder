@@ -65,7 +65,7 @@ Two rules the "Citrus" design depends on:
 
 **Proximity/status logic:** `src/services/distance.ts` (Haversine) + `src/services/proximity.ts` (distance → `{label, color}` status) feed `src/hooks/useNearbyPlaces.ts`, which both the home screen's "nearby" section and the map screen consume independently — pass the result down as a prop rather than calling the hook twice in the same tree (it re-derives from `usePlaces` + `useLocation` each time).
 
-**Language:** all user-facing UI strings are Danish (da-DK), including `Alert` copy, notification text, and `app.json` permission descriptions. Code identifiers/comments are English. Keep new user-facing strings in Danish for consistency.
+**Language:** all user-facing UI strings are English, including `Alert` copy, notification text, and `app.json` permission descriptions. Code identifiers and comments are English too. The app was Danish (da-DK) until 2026-08-04 and was translated wholesale; there is no i18n layer — strings are inline literals, and a second locale would mean introducing one from scratch. `dayjs` uses its default English locale (the `dayjs/locale/da` imports are gone) — don't re-add a locale import without also handling it in both `PlaceCard` and `app/places/[id].tsx`, which configure `dayjs` independently.
 
 **Notifications:** `src/services/notifications.ts` configures the foreground notification handler and exposes `sendNotification`/`requestNotificationPermissions`/`hasNotificationPermission`; the geofencing background task calls `sendNotification` directly when a region-enter event fires, passing `{ placeId }` as the data payload so `useNotificationDeepLink` can route the tap.
 

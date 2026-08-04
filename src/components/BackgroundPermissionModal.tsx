@@ -20,19 +20,19 @@ export default function BackgroundPermissionModal({
       <View style={styles.overlay}>
         <FadeInView style={styles.cardWrapper}>
           <SafeAreaView style={styles.card}>
-            <Text style={styles.heading}>Slå påmindelser til</Text>
+            <Text style={styles.heading}>Turn reminders on</Text>
             <Text style={styles.body}>
-              Tillad lokation i baggrunden, så vi kan give dig en påmindelse,
-              næste gang du er i nærheden — også selvom appen ikke er åben.
+              Allow background location, so we can give you a reminder the next
+              time you&apos;re nearby — even when the app isn&apos;t open.
             </Text>
 
             <AnimatedPressable
               style={styles.primaryButton}
               onPress={onAccept}
               accessibilityRole="button"
-              accessibilityLabel="Ja, giv adgang"
+              accessibilityLabel="Yes, allow it"
             >
-              <Text style={styles.primaryButtonText}>Ja, giv adgang</Text>
+              <Text style={styles.primaryButtonText}>Yes, allow it</Text>
             </AnimatedPressable>
 
             <AnimatedPressable
@@ -40,9 +40,9 @@ export default function BackgroundPermissionModal({
               onPress={onDismiss}
               haptic={false}
               accessibilityRole="button"
-              accessibilityLabel="Ikke nu"
+              accessibilityLabel="Not now"
             >
-              <Text style={styles.dismissButtonText}>Ikke nu</Text>
+              <Text style={styles.dismissButtonText}>Not now</Text>
             </AnimatedPressable>
           </SafeAreaView>
         </FadeInView>

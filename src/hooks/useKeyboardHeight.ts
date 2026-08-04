@@ -2,21 +2,21 @@ import { useEffect, useState } from "react";
 import { Keyboard, Platform } from "react-native";
 
 /**
- * Tastaturets aktuelle højde i punkter — 0 når det er lukket.
+ * The keyboard's current height in points — 0 when it is closed.
  *
- * KeyboardAvoidingView kan skubbe et ark op, men den fortæller aldrig hvor
- * meget plads der er tilbage. Et ark hvis højde er sat i procent måler derfor
- * stadig mod HELE skærmen, også mens tastaturet dækker halvdelen, og vokser ud
- * over toppen. Med tallet herfra kan højden regnes i pixels mod den plads der
- * faktisk er.
+ * KeyboardAvoidingView can push a sheet up, but it never says how much room is
+ * left. A sheet whose height is set as a percentage therefore still measures
+ * against the WHOLE screen, even while the keyboard covers half of it, and
+ * grows past the top. With the number from here, the height can be calculated
+ * in pixels against the space that actually exists.
  */
 export function useKeyboardHeight() {
   const [height, setHeight] = useState(0);
 
   useEffect(() => {
-    // "will"-varianterne findes kun på iOS, men de rammer samtidig med
-    // tastaturets animation frem for efter den, så arket følger med i stedet
-    // for at hoppe på plads bagefter.
+    // The "will" variants only exist on iOS, but they fire alongside the
+    // keyboard's animation rather than after it, so the sheet follows along
+    // instead of snapping into place afterwards.
     const showEvent =
       Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
     const hideEvent =

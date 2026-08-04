@@ -19,13 +19,13 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-/** Højden af luk-knappens række, så ScrollView'ens grænse kan trække den fra. */
+/** Height of the close-button row, so the ScrollView's limit can subtract it. */
 const CLOSE_ROW_HEIGHT = 46;
 
 /**
- * Hvor langt arket hænger ned under skærmkanten. Cremefarven fortsætter forbi
- * bunden, så hverken afrunding eller subpixel-placering kan efterlade en
- * stribe af den mørke baggrund langs nederste kant.
+ * How far the sheet hangs below the screen edge. The cream colour continues
+ * past the bottom, so neither rounding nor subpixel placement can leave a strip
+ * of the dark background along the bottom edge.
  */
 const SHEET_OVERHANG = 120;
 
@@ -56,25 +56,25 @@ export default function CreatePlaceModal({
   const { height: windowHeight } = useWindowDimensions();
   const keyboardHeight = useKeyboardHeight();
 
-  // Et konkret pixeltal, ikke "92%" eller flex:1. Sheet'et er en
-  // hug-content-boks (kun maxHeight, ingen egen height/flex) — en flex:1-
-  // ScrollView deri kan ikke vide hvor meget plads den har, fordi boksens
-  // egen højde afhænger af ScrollView'ens indhold, som igen venter på at
-  // vide sin plads. Et fast tal bryder den cirkularitet.
+  // A concrete pixel value, not "92%" or flex:1. The sheet is a hug-content
+  // box (maxHeight only, no height/flex of its own) — a flex:1 ScrollView
+  // inside it cannot know how much room it has, because the box's own height
+  // depends on the ScrollView's content, which in turn is waiting to learn its
+  // own space. A fixed number breaks that circularity.
   //
-  // Tastaturet trækkes fra FØRST. Uden det var tallet stadig regnet ud fra
-  // hele skærmen, mens KeyboardAvoidingView skubbede arket op — så toppen
-  // (overskrift og emoji-vælger) endte oppe bag statuslinjen, netop når
-  // tastaturet var åbent.
+  // The keyboard is subtracted FIRST. Without that, the number was still
+  // derived from the whole screen while KeyboardAvoidingView pushed the sheet
+  // up — so the top (heading and emoji picker) ended up behind the status bar,
+  // exactly when the keyboard was open.
   const sheetMaxHeight = Math.round((windowHeight - keyboardHeight) * 0.92);
 
-  // Med tastatur oppe dækker det allerede home-indikatoren, så arkets egen
-  // bundpolstring ville bare være dødt rum oven på tasterne.
+  // With the keyboard up it already covers the home indicator, so the sheet's
+  // own bottom padding would just be dead space on top of the keys.
   const sheetPaddingBottom = keyboardHeight > 0 ? theme.spacing.md : insets.bottom;
 
-  // ScrollView'en skal have sin EGEN grænse, fratrukket arkets egen padding —
-  // ellers kan de tilsammen blive højere end sheetMaxHeight, og bunden bliver
-  // klippet væk af overflow:hidden i stedet for at kunne scrolles til.
+  // The ScrollView needs its OWN limit, minus the sheet's own padding —
+  // otherwise the two together can exceed sheetMaxHeight, and the bottom gets
+  // clipped by overflow:hidden instead of being scrollable to.
   const scrollMaxHeight =
     sheetMaxHeight - sheetPaddingBottom - theme.spacing.md - CLOSE_ROW_HEIGHT;
 
@@ -95,34 +95,34 @@ export default function CreatePlaceModal({
       onRequestClose={onClose}
     >
       {/*
-        KeyboardAvoidingView SKAL være det yderste flex:1-lag, ikke nestet
-        inde i det — ellers "padding"-adfærden bare gør arket højere i stedet
-        for at give det mindre plads, og toppen (overskrift, emoji-vælger)
-        skubbes usynligt op over skærmens kant når tastaturet (særligt det
-        høje emoji-tastatur) åbner.
+        KeyboardAvoidingView MUST be the outermost flex:1 layer, not nested
+        inside one — otherwise the "padding" behaviour just makes the sheet
+        taller instead of giving it less room, and the top (heading, emoji
+        picker) is pushed invisibly past the screen edge when the keyboard
+        (especially the tall emoji keyboard) opens.
       */}
       <KeyboardAvoidingView
         style={styles.backdrop}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        {/* Tryk uden for arket lukker det — samme forventning som ethvert
-            andet bundark på iOS. */}
+        {/* Tapping outside the sheet closes it — the same expectation as any
+            other bottom sheet on iOS. */}
         <Pressable
           style={styles.backdropFill}
           onPress={onClose}
           accessibilityRole="button"
-          accessibilityLabel="Luk"
+          accessibilityLabel="Close"
         />
 
         <View
           style={[
             styles.sheet,
             {
-              // Overhænget lægges oven i grænsen, så den SYNLIGE højde stadig
-              // er sheetMaxHeight.
+              // The overhang is added on top of the limit, so the VISIBLE
+              // height is still sheetMaxHeight.
               maxHeight: sheetMaxHeight + SHEET_OVERHANG,
-              // Cremefarven fortsætter ned under home-indikatoren og videre ud
-              // over skærmkanten, hvor bundkanten gemmer sig.
+              // The cream continues down under the home indicator and on past
+              // the screen edge, where the bottom border hides.
               paddingBottom: sheetPaddingBottom + SHEET_OVERHANG,
               marginBottom: -SHEET_OVERHANG,
             },
@@ -133,7 +133,7 @@ export default function CreatePlaceModal({
               style={styles.closeButton}
               onPress={onClose}
               accessibilityRole="button"
-              accessibilityLabel="Luk"
+              accessibilityLabel="Close"
             >
               <Ionicons
                 name="close"
@@ -150,7 +150,7 @@ export default function CreatePlaceModal({
             showsVerticalScrollIndicator={false}
           >
             <Text style={styles.heading}>
-              {isEditing ? "Rediger sted" : "Hvad er her?"}
+              {isEditing ? "Edit place" : "What's here?"}
             </Text>
 
             <PlaceFormFields
@@ -164,7 +164,7 @@ export default function CreatePlaceModal({
               onChangeEmoji={setEmoji}
               onSave={() => onSave(name, note, radius, emoji)}
               showSuggestions={!isEditing}
-              saveLabel={isEditing ? "Gem ændringer" : undefined}
+              saveLabel={isEditing ? "Save changes" : undefined}
             />
           </ScrollView>
         </View>
@@ -189,21 +189,21 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
     borderTopLeftRadius: theme.radius.sheet,
     borderTopRightRadius: theme.radius.sheet,
-    // Bevidst UDEN kant — det eneste sted i appen uden den mørke streg.
-    // Designet vil have "border-top" alene, men React Native kan ikke tegne en
-    // kant på én side sammen med borderRadius (iOS falder tilbage til en anden
-    // kodesti, og hjørnerne buer ikke med), og en hel kant efterlader to
-    // lodrette streger der slutter brat ved skærmkanten. Den mørke baggrund
-    // afgrænser allerede arket tydeligt.
+    // Deliberately WITHOUT a border — the only place in the app without the
+    // dark outline. The design wants "border-top" alone, but React Native
+    // cannot draw a single-sided border together with borderRadius (iOS falls
+    // back to a different code path and the corners don't curve along), and a
+    // full border leaves two vertical lines ending abruptly at the screen
+    // edge. The dark backdrop already delimits the sheet clearly.
     paddingTop: theme.spacing.md,
-    // Bevidst INGEN overflow:"hidden" her. Den lavede et maskelag, som iOS
-    // rundede bundhjørnerne på, så baggrunden sivede igennem i siderne.
-    // ScrollView'en klipper allerede sit eget indhold, og dens maxHeight
-    // holder den inden for arket — så masken var overflødig.
+    // Deliberately NO overflow:"hidden" here. It created a mask layer whose
+    // bottom corners iOS rounded, letting the background bleed through at the
+    // sides. The ScrollView already clips its own content, and its maxHeight
+    // keeps it inside the sheet — so the mask was redundant.
   },
 
-  // Erstatter den tidligere greb-streg, som så ud som om man kunne trække i
-  // den uden at kunne det. Et kryds lover kun det, det faktisk gør.
+  // Replaces the earlier grabber bar, which looked draggable without being so.
+  // A cross only promises what it actually does.
   closeRow: {
     height: CLOSE_ROW_HEIGHT,
     paddingHorizontal: theme.spacing.xl,

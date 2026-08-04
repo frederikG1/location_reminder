@@ -14,14 +14,14 @@ type Props = {
 export default function NearbyPlacesSection({ nearbyPlaces }: Props) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>I nærheden</Text>
+      <Text style={styles.title}>Nearby</Text>
 
       {nearbyPlaces.length === 0 ? (
         <View style={styles.emptyCard}>
-          <Text style={styles.emptyTitle}>Intet i nærheden</Text>
+          <Text style={styles.emptyTitle}>Nothing nearby</Text>
 
           <Text style={styles.emptyText}>
-            Du får besked, når du nærmer dig et gemt sted.
+            You&apos;ll hear from us when you get close to a saved place.
           </Text>
         </View>
       ) : (
@@ -38,13 +38,14 @@ export default function NearbyPlacesSection({ nearbyPlaces }: Props) {
                 })
               }
               accessibilityRole="button"
-              accessibilityLabel={`${place.name}, ${formatDistance(distance)} væk, ${status.label}${place.note ? `. ${place.note}` : ""}`}
+              accessibilityLabel={`${place.name}, ${formatDistance(distance)} away, ${status.label}${place.note ? `. ${place.note}` : ""}`}
             >
               <View style={styles.topRow}>
                 <Text style={styles.placeName}>{place.name}</Text>
 
-                {/* Afstanden er mere brugbar end nærhedsgraden på skærmen;
-                    selve statusordet lever videre i accessibilityLabel. */}
+                {/* The distance is more useful on screen than the proximity
+                    grade; the status word itself lives on in the
+                    accessibilityLabel. */}
                 <View style={styles.distanceBadge}>
                   <Text style={styles.distanceText}>
                     {formatDistance(distance)}
@@ -61,8 +62,8 @@ export default function NearbyPlacesSection({ nearbyPlaces }: Props) {
 }
 
 const styles = StyleSheet.create({
-  // Ingen paddingHorizontal her — den horisontale indrykning kommer nu fra
-  // app/index.tsx's scrollContent, så "I nærheden" og "Mine steder" flugter.
+  // No paddingHorizontal here — the horizontal inset now comes from
+  // app/index.tsx's scrollContent, so "Nearby" and "My places" line up.
   container: {
     marginTop: theme.spacing.md,
   },

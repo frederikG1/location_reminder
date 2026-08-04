@@ -17,8 +17,9 @@ import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 
-// Hele temaet er sat i Nunito. Vises noget før fonten er klar, skifter layoutet
-// synligt under brugeren — så vi holder splashen oppe indtil da.
+// The whole theme is set in Nunito. Showing anything before the font is ready
+// makes the layout visibly shift under the user — so we keep the splash up
+// until it is.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -32,8 +33,8 @@ export default function RootLayout() {
   useNotificationDeepLink();
 
   useEffect(() => {
-    // Fejler fonten, er en app i systemskrift bedre end en app der aldrig
-    // kommer forbi splashen.
+    // If the font fails, an app in the system typeface beats an app that never
+    // gets past the splash.
     if (fontsLoaded || fontError) {
       SplashScreen.hideAsync();
     }
@@ -48,11 +49,11 @@ export default function RootLayout() {
       <ErrorBoundary>
         <LocationProvider>
           {/*
-            Ingen skærme bruger den native header. Den er en hvid bjælke med
-            systemets chevron og systemskrift — tre ting appen ikke bruger
-            nogen andre steder. Hver skærm sætter i stedet sin egen
-            <ScreenHeader />, så tilbageknappen er den samme cirkel som
-            resten af appens ikonknapper.
+            No screen uses the native header. It is a white bar with the
+            system chevron and the system typeface — three things the app uses
+            nowhere else. Each screen sets its own <ScreenHeader /> instead, so
+            the back button is the same circle as the rest of the app's icon
+            buttons.
           */}
           <Stack
             screenOptions={{
@@ -69,8 +70,9 @@ export default function RootLayout() {
           </Stack>
 
           {/*
-            Sat her frem for per skærm: paletten er lys-only, og kortet ligger
-            nu helt op under statuslinjen, hvor lys tekst ville forsvinde.
+            Set here rather than per screen: the palette is light-only, and the
+            map now runs all the way up under the status bar, where light text
+            would disappear.
           */}
           <StatusBar style="dark" />
         </LocationProvider>

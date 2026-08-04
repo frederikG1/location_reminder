@@ -10,8 +10,8 @@ export const GEOFENCING_TASK_NAME = "location-reminder-geofencing";
 
 const STORAGE_KEY = "places";
 
-// Står man på kanten af en region, fyrer OS'et Enter igen og igen. Uden en
-// karensperiode bliver det til en byge af notifikationer og besøg.
+// Standing on the edge of a region makes the OS fire Enter over and over.
+// Without a cooldown that turns into a barrage of notifications and visits.
 const NOTIFICATION_COOLDOWN_MS = 30 * 60 * 1000;
 
 async function getStoredPlaces(): Promise<Place[]> {
@@ -20,13 +20,13 @@ async function getStoredPlaces(): Promise<Place[]> {
     const parsed = data ? JSON.parse(data) : [];
     return Array.isArray(parsed) ? (parsed as Place[]) : [];
   } catch (error) {
-    log("Kunne ikke læse steder i baggrundstask:", error);
+    log("Couldn't read places in background task:", error);
     return [];
   }
 }
 
 async function isWithinCooldown(placeId: string): Promise<boolean> {
-  // addVisit lægger nyeste forrest, så det første element er seneste besøg.
+  // addVisit puts the newest first, so the first element is the latest visit.
   const [lastVisit] = await getVisitsForPlace(placeId);
 
   if (!lastVisit) {
@@ -40,7 +40,7 @@ async function isWithinCooldown(placeId: string): Promise<boolean> {
 
 TaskManager.defineTask(GEOFENCING_TASK_NAME, async ({ data, error }) => {
   if (error) {
-    log("Geofencing task fejl:", error.message);
+    log("Geofencing task error:", error.message);
     return;
   }
 
@@ -72,8 +72,8 @@ TaskManager.defineTask(GEOFENCING_TASK_NAME, async ({ data, error }) => {
   });
 
   await sendNotification(
-    `Du er tæt på ${place.name}`,
-    place.note || "Du har gemt en påmindelse her.",
+    `You're close to ${place.name}`,
+    place.note || "You saved a reminder here.",
     { placeId: place.id },
   );
 });

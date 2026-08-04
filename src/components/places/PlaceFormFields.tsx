@@ -37,10 +37,10 @@ type Suggestion = {
 };
 
 const SUGGESTIONS: Suggestion[] = [
-  { emoji: "🛒", name: "Netto", note: "Mælk og kaffefiltre" },
-  { emoji: "🏋️", name: "Fitness", note: "Tag tøjet med hjem" },
-  // { emoji: "🏠", name: "Mor", note: "Giv boremaskinen tilbage" },
-  { emoji: "☕", name: "Spisested", note: "Hyggelig café"}
+  { emoji: "🛒", name: "Groceries", note: "Milk and coffee filters" },
+  { emoji: "🏋️", name: "Gym", note: "Take the kit home" },
+  // { emoji: "🏠", name: "Mum", note: "Give the drill back" },
+  { emoji: "☕", name: "Coffee", note: "The nice little café" }
 ];
 
 type Props = {
@@ -78,8 +78,8 @@ export default function PlaceFormFields({
   const canSave = name.trim().length > 0;
 
   const buttonLabel = canSave
-    ? (saveLabel ?? `Gem ${name.trim()}`)
-    : "Vælg eller skriv et navn først";
+    ? (saveLabel ?? `Save ${name.trim()}`)
+    : "Pick or type a name first";
 
   function applySuggestion(suggestion: Suggestion) {
     onChangeName(suggestion.name);
@@ -96,10 +96,10 @@ export default function PlaceFormFields({
           placeholder={getPlaceEmoji(name)}
           maxLength={16}
           style={styles.emojiInput}
-          accessibilityLabel="Symbol for stedet"
-          accessibilityHint="Skriv en emoji, ellers vælger vi en ud fra navnet"
+          accessibilityLabel="Symbol for the place"
+          accessibilityHint="Type an emoji, or we'll pick one from the name"
         />
-        <Text style={styles.emojiHint}>Tryk for at vælge dit eget symbol</Text>
+        <Text style={styles.emojiHint}>Tap to choose your own symbol</Text>
       </View>
 
       {showSuggestions ? (
@@ -130,7 +130,7 @@ export default function PlaceFormFields({
       <TextInput
         value={name}
         onChangeText={onChangeName}
-        placeholder="Tryk på et forslag, eller skriv et navn"
+        placeholder="Tap a suggestion, or type a name"
         placeholderTextColor={theme.colors.textMuted}
         style={styles.input}
       />
@@ -138,13 +138,13 @@ export default function PlaceFormFields({
       <TextInput
         value={note}
         onChangeText={onChangeNote}
-        placeholder="Hvorfor? Mælk, filtre, det sædvanlige…"
+        placeholder="Why? Milk, filters, the usual…"
         placeholderTextColor={theme.colors.textMuted}
         style={[styles.input, styles.inputSpaced]}
       />
 
       <View style={styles.radiusRow}>
-        <Text style={styles.radiusLabel}>Påmind mig indenfor</Text>
+        <Text style={styles.radiusLabel}>Remind me within</Text>
 
         <View style={styles.radiusValueRow}>
           <Text style={styles.radiusValue}>{formatRadiusLabel(radius)}</Text>

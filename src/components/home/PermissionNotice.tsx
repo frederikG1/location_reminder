@@ -11,9 +11,9 @@ type Props = {
 };
 
 /**
- * Det gule kort på hjemmeskærmen der fortæller at noget er slået fra og hvad
- * man gør ved det. Bruges til både baggrundslokation og notifikationer, så de
- * to advarsler ser ens ud.
+ * The yellow card on the home screen that says something is turned off and
+ * what to do about it. Used for both background location and notifications, so
+ * the two warnings look the same.
  */
 export default function PermissionNotice({
   title,
@@ -38,8 +38,8 @@ export default function PermissionNotice({
 }
 
 const styles = StyleSheet.create({
-  // Ingen paddingHorizontal her — indrykningen kommer fra scrollContent i
-  // app/index.tsx, det eneste sted der bruger denne komponent.
+  // No paddingHorizontal here — the inset comes from scrollContent in
+  // app/index.tsx, the only place that uses this component.
   wrapper: {
     marginTop: theme.spacing.md,
   },

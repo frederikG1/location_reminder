@@ -10,7 +10,6 @@ import { theme } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import "dayjs/locale/da";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -18,7 +17,6 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import MapView, { Circle, Marker } from "react-native-maps";
 
 dayjs.extend(relativeTime);
-dayjs.locale("da");
 
 export default function PlaceDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -33,7 +31,7 @@ export default function PlaceDetailScreen() {
     return (
       <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
         <ScreenHeader />
-        <Text style={styles.notFound}>Sted ikke fundet</Text>
+        <Text style={styles.notFound}>Place not found</Text>
       </SafeAreaView>
     );
   }
@@ -45,8 +43,8 @@ export default function PlaceDetailScreen() {
       style={styles.container}
       edges={["top", "left", "right", "bottom"]}
     >
-      {/* Uden titel — stedets eget navn står stort lige nedenunder, og "Sted"
-          ovenover ville kun sige det samme med et fladere ord. */}
+      {/* No title — the place's own name sits large right below, and "Place"
+          above it would only say the same thing in a flatter word. */}
       <ScreenHeader />
 
       <ScrollView
@@ -112,20 +110,20 @@ export default function PlaceDetailScreen() {
               })
             }
             accessibilityRole="button"
-            accessibilityLabel={`Vis rute til ${place.name}`}
+            accessibilityLabel={`Show directions to ${place.name}`}
           >
             <Ionicons
               name="navigate-outline"
               size={17}
               color={theme.colors.primaryStrong}
             />
-            <Text style={styles.routeButtonText}>Vis rute</Text>
+            <Text style={styles.routeButtonText}>Directions</Text>
           </AnimatedPressable>
         </FadeInView>
 
         <FadeInView delay={130} style={styles.statsRow}>
           <View style={styles.statBlock}>
-            <Text style={styles.statLabel}>Oprettet</Text>
+            <Text style={styles.statLabel}>Created</Text>
             <Text style={styles.statValue}>
               {place.createdAt ? dayjs(place.createdAt).fromNow() : "—"}
             </Text>
@@ -135,13 +133,13 @@ export default function PlaceDetailScreen() {
         <FadeInView delay={140} style={styles.historySection}>
           <Text style={styles.sectionTitle}>
             {visits.length === 0
-              ? "Ingen påmindelser endnu"
-              : `Mindet om dette sted ${visits.length} ${visits.length === 1 ? "gang" : "gange"}`}
+              ? "No reminders yet"
+              : `Reminded about this place ${visits.length} ${visits.length === 1 ? "time" : "times"}`}
           </Text>
 
           {visits.length === 0 ? (
             <Text style={styles.historyEmpty}>
-              Næste gang du er i nærheden, dukker det op her.
+              The next time you&apos;re nearby, it&apos;ll show up here.
             </Text>
           ) : (
             <View style={styles.historyList}>
@@ -163,18 +161,18 @@ export default function PlaceDetailScreen() {
           style={styles.secondaryButton}
           onPress={() => setEditModalVisible(true)}
           accessibilityRole="button"
-          accessibilityLabel={`Rediger ${place.name}`}
+          accessibilityLabel={`Edit ${place.name}`}
         >
-          <Text style={styles.secondaryButtonText}>Rediger</Text>
+          <Text style={styles.secondaryButtonText}>Edit</Text>
         </AnimatedPressable>
 
         <AnimatedPressable
           style={styles.destructiveButton}
           onPress={() => handleDelete(place.id)}
           accessibilityRole="button"
-          accessibilityLabel={`Slet ${place.name}`}
+          accessibilityLabel={`Delete ${place.name}`}
         >
-          <Text style={styles.destructiveButtonText}>Slet sted</Text>
+          <Text style={styles.destructiveButtonText}>Delete place</Text>
         </AnimatedPressable>
       </View>
 
@@ -202,10 +200,10 @@ export default function PlaceDetailScreen() {
   );
 
   function handleDelete(placeId: string) {
-    Alert.alert("Slet sted", "Er du sikker på, at du vil slette dette sted?", [
-      { text: "Annuller", style: "cancel" },
+    Alert.alert("Delete place", "Are you sure you want to delete this place?", [
+      { text: "Cancel", style: "cancel" },
       {
-        text: "Slet",
+        text: "Delete",
         style: "destructive",
         onPress: async () => {
           await remove(placeId);
@@ -238,7 +236,7 @@ export default function PlaceDetailScreen() {
       });
       setEditModalVisible(false);
     } catch {
-      Alert.alert("Kunne ikke gemme", "Prøv igen om lidt.");
+      Alert.alert("Couldn't save", "Try again in a moment.");
     }
   }
 }
@@ -250,7 +248,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: theme.spacing.xl,
-    // Mindre foroven end i siderne — headeren har allerede sat luft af.
+    // Less at the top than at the sides — the header has already set aside room.
     paddingTop: theme.spacing.md,
   },
   header: {

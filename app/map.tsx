@@ -80,7 +80,7 @@ export default function MapScreen() {
               title={place.name}
               description={
                 distance !== null
-                  ? `${Math.round(distance)} meter væk${place.note ? ` - ${place.note}` : ""}`
+                  ? `${Math.round(distance)} meters away${place.note ? ` - ${place.note}` : ""}`
                   : place.note
               }
               pinColor={isNearby ? theme.colors.primary : theme.colors.danger}
@@ -106,9 +106,9 @@ export default function MapScreen() {
         ))}
       </MapView>
 
-      {/* Kortet får hele skærmen — en header ovenover ville koste et bånd af
-          netop det, skærmen findes for at vise. Knappen flyder derfor oven på
-          kortet, med samme kant og flade som forklaringsboksen nederst. */}
+      {/* The map gets the whole screen — a header above it would cost a band of
+          exactly what the screen exists to show. So the button floats on top of
+          the map, with the same border and surface as the legend at the bottom. */}
       <BackButton
         style={[styles.backButton, { top: insets.top + theme.spacing.sm }]}
       />
@@ -123,13 +123,13 @@ export default function MapScreen() {
               { backgroundColor: theme.colors.primary },
             ]}
           />
-          <Text style={styles.legendText}>I nærheden</Text>
+          <Text style={styles.legendText}>Nearby</Text>
         </View>
         <View style={styles.legendRow}>
           <View
             style={[styles.legendDot, { backgroundColor: theme.colors.danger }]}
           />
-          <Text style={styles.legendText}>Udenfor radius</Text>
+          <Text style={styles.legendText}>Outside radius</Text>
         </View>
       </FadeInView>
     </View>

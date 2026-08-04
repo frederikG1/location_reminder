@@ -8,9 +8,9 @@ export async function hasCompletedOnboarding() {
     const value = await AsyncStorage.getItem(HAS_COMPLETED_ONBOARDING_KEY);
     return value === "true";
   } catch (error) {
-    // Kan vi ikke læse flaget, er det bedre at vise introduktionen igen end at
-    // efterlade brugeren på en tom skærm.
-    log("Kunne ikke læse onboarding-status:", error);
+    // If we can't read the flag, showing the intro again beats leaving the
+    // user on an empty screen.
+    log("Couldn't read onboarding status:", error);
     return false;
   }
 }
